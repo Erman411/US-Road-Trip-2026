@@ -1,0 +1,2582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DC → LA · Road Trip 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0D1117;
+    --surface: #161B22;
+    --surface2: #1E2530;
+    --cream: #F5F0E8;
+    --muted: #8B9099;
+    --gold: #E8C547;
+    --terra: #C45C3A;
+    --green: #2A6B52;
+    --blue: #3A6B8A;
+    --purple: #6B4A8A;
+    --border: rgba(255,255,255,0.07);
+    --region-glow: rgba(232,197,71,0.06);
+  }
+
+  /* ── REGION COLOUR SHIFT ── */
+  body { transition: background 2s ease; }
+  .region-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    transition: background 2.5s ease, opacity 2s ease;
+    opacity: 1;
+  }
+  .main-layout, .hero, nav, main { position: relative; z-index: 1; }
+
+  /* ── STAMP COLLECTION ── */
+  .stamps-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 48px;
+  }
+  .stamps-intro {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .stamps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 12px;
+  }
+  .stamp {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    user-select: none;
+  }
+  .stamp:hover { transform: scale(1.05); }
+  .stamp-inner {
+    width: 80px; height: 80px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border: 2px dashed rgba(255,255,255,0.15);
+    background: var(--surface2);
+    position: relative;
+    transition: all 0.4s ease;
+    overflow: hidden;
+  }
+  .stamp-inner::before {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 2px;
+  }
+  .stamp.collected .stamp-inner {
+    border-color: var(--gold);
+    border-style: solid;
+    background: linear-gradient(135deg, rgba(232,197,71,0.15), rgba(196,92,58,0.1));
+    box-shadow: 0 0 16px rgba(232,197,71,0.2);
+  }
+  .stamp-emoji { font-size: 24px; filter: grayscale(1); opacity: 0.3; transition: all 0.4s; }
+  .stamp.collected .stamp-emoji { filter: grayscale(0); opacity: 1; }
+  .stamp-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+  .stamp.collected .stamp-num { color: var(--gold); }
+  .stamp-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.3;
+    max-width: 80px;
+  }
+  .stamp.collected .stamp-label { color: var(--cream); }
+  .stamp-collected-tick {
+    position: absolute;
+    top: 3px; right: 5px;
+    font-size: 9px;
+    color: var(--gold);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .stamp.collected .stamp-collected-tick { opacity: 1; }
+  .stamp-pop {
+    animation: stampPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes stampPop {
+    0% { transform: scale(0.8); opacity: 0.5; }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .stamps-progress {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .stamps-progress-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .stamps-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--terra));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+  .stamps-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+
+  /* ── POSTCARD GENERATOR ── */
+  .postcard-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 48px;
+  }
+  .postcard-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .postcard-select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--cream);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    padding: 10px 14px;
+    flex: 1;
+    min-width: 200px;
+    appearance: none;
+    cursor: pointer;
+  }
+  .postcard-select:focus { outline: 1px solid var(--gold); }
+  .postcard-btn {
+    background: var(--gold);
+    color: #0D1117;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 10px 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+  }
+  .postcard-btn:hover { opacity: 0.85; }
+  .postcard-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .postcard-output {
+    display: none;
+    background: #F5F0E8;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    max-width: 600px;
+  }
+  .postcard-output.visible { display: block; }
+  .postcard-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 280px;
+  }
+  .postcard-left {
+    padding: 28px;
+    background: linear-gradient(135deg, #2A1F0F, #1A2A1F, #0D1117);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .postcard-region-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .postcard-stop-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: #F5F0E8;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+  .postcard-emoji-large { font-size: 36px; }
+  .postcard-date-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: auto;
+  }
+  .postcard-right {
+    padding: 28px;
+    background: #F5F0E8;
+    border-left: 1px dashed #ccc;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .postcard-lines { flex: 1; }
+  .postcard-message {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    color: #1a1a1a;
+    line-height: 1.7;
+    font-style: italic;
+  }
+  .postcard-address-block {
+    border-top: 1px solid #ccc;
+    padding-top: 12px;
+  }
+  .postcard-stamp-corner {
+    width: 40px; height: 48px;
+    border: 1px solid #999;
+    float: right;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    background: white;
+    margin-left: 8px;
+  }
+  .postcard-address-lines {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: #666;
+    line-height: 1.8;
+  }
+  .postcard-loading {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 20px 0;
+    display: none;
+  }
+  .postcard-loading.visible { display: block; }
+
+  /* ── LIVE WEATHER ── */
+  .live-weather-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 48px;
+  }
+  .weather-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  .live-weather-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+  .live-weather-card:hover { border-color: rgba(232,197,71,0.2); }
+  .lw-city {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .lw-icon { font-size: 28px; margin-bottom: 6px; }
+  .lw-temp {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--cream);
+    display: block;
+  }
+  .lw-desc {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    text-transform: capitalize;
+  }
+  .lw-loading {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+  .lw-note {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 16px;
+    opacity: 0.6;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px;
+    position: relative;
+    background: radial-gradient(ellipse at 50% 60%, rgba(232,197,71,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse at 20% 80%, rgba(196,92,58,0.06) 0%, transparent 50%),
+                var(--bg);
+    overflow: hidden;
+  }
+
+  .hero-road {
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 40%;
+    background: linear-gradient(to top, transparent, var(--gold));
+    opacity: 0.3;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(48px, 10vw, 100px);
+    font-weight: 900;
+    line-height: 0.95;
+    color: var(--cream);
+    margin-bottom: 12px;
+  }
+
+  .hero h1 span { color: var(--gold); }
+
+  .hero-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 48px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 48px;
+  }
+
+  .hero-stat { text-align: center; }
+  .hero-stat .val {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--gold);
+    display: block;
+  }
+  .hero-stat .lbl {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .countdown-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 32px;
+    display: inline-flex;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .countdown-unit { text-align: center; }
+  .countdown-unit .num {
+    font-family: 'Space Mono', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--cream);
+    display: block;
+  }
+  .countdown-unit .lbl {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .countdown-sep {
+    font-family: 'Space Mono', monospace;
+    font-size: 24px;
+    color: var(--gold);
+    opacity: 0.5;
+    margin-top: -8px;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    animation: bounce 2s infinite;
+  }
+  .scroll-hint::after {
+    content: '↓';
+    font-size: 16px;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ── LAYOUT ── */
+  .main-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 100vh;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+    gap: 0;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 32px 0 32px 0;
+    border-right: 1px solid var(--border);
+    scrollbar-width: none;
+  }
+  .sidebar::-webkit-scrollbar { display: none; }
+
+  .sidebar-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 0 20px 16px;
+  }
+
+  .route-line-wrap {
+    position: relative;
+    padding-left: 20px;
+  }
+
+  .route-line {
+    position: absolute;
+    left: 28px;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--gold), var(--terra), var(--green));
+    opacity: 0.3;
+  }
+
+  .sidebar-stop {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 16px 6px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 0 8px 8px 0;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 12px;
+    position: relative;
+  }
+  .sidebar-stop:hover, .sidebar-stop.active {
+    color: var(--cream);
+    background: var(--surface);
+  }
+  .sidebar-stop.active { color: var(--gold); }
+
+  .stop-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--muted);
+    transition: all 0.2s;
+    position: relative;
+    z-index: 1;
+  }
+  .sidebar-stop.active .stop-dot,
+  .sidebar-stop:hover .stop-dot { background: var(--gold); }
+
+  .stop-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    width: 16px;
+    flex-shrink: 0;
+  }
+
+  /* ── CONTENT ── */
+  .content {
+    padding: 48px 0 48px 48px;
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-top: 48px;
+  }
+  .section-header:first-child { padding-top: 0; }
+
+  .section-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--cream);
+  }
+
+  /* ── STOP CARDS ── */
+  .stop-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+    scroll-margin-top: 32px;
+  }
+  .stop-card:hover { border-color: rgba(255,255,255,0.15); }
+
+  .stop-card-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .stop-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    width: 24px;
+  }
+
+  .stop-meta { flex: 1; }
+
+  .stop-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--cream);
+    margin-bottom: 4px;
+  }
+
+  .stop-info-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .stop-date {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .stop-nights {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .stop-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+  }
+  .tag-city    { background: rgba(58,107,138,0.25); color: #7BB8D8; }
+  .tag-nature  { background: rgba(42,107,82,0.25);  color: #6BBD96; }
+  .tag-desert  { background: rgba(196,92,58,0.25);  color: #E8895A; }
+  .tag-nightlife { background: rgba(107,74,138,0.25); color: #B88AD8; }
+  .tag-midwest { background: rgba(138,120,58,0.25); color: #D8C56B; }
+
+  .chevron {
+    color: var(--muted);
+    font-size: 12px;
+    transition: transform 0.3s;
+  }
+  .stop-card.open .chevron { transform: rotate(180deg); }
+
+  .stop-card-body {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+  .stop-card.open .stop-card-body { display: block; }
+
+  .stop-body-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .stop-section {
+    padding: 24px;
+    border-right: 1px solid var(--border);
+  }
+  .stop-section:last-child, .stop-section:nth-child(2n) { border-right: none; }
+  .stop-section-full {
+    padding: 24px;
+    border-top: 1px solid var(--border);
+    grid-column: 1 / -1;
+  }
+
+  .stop-section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .hotel-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .hotel-option:last-child { border-bottom: none; }
+
+  .hotel-rank {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .hotel-name {
+    font-size: 13px;
+    color: var(--cream);
+    flex: 1;
+    font-weight: 500;
+  }
+  .hotel-name a {
+    color: var(--cream);
+    text-decoration: none;
+  }
+  .hotel-name a:hover { color: var(--gold); }
+
+  .hotel-price {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .highlights-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .highlights-list li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 13px;
+    color: var(--cream);
+    opacity: 0.85;
+  }
+
+  .highlights-list li::before {
+    content: '→';
+    color: var(--gold);
+    flex-shrink: 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    margin-top: 1px;
+  }
+
+  .drive-info {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .drive-stat { }
+  .drive-stat .val {
+    font-family: 'Space Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--cream);
+    display: block;
+  }
+  .drive-stat .lbl {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .drive-sep {
+    color: var(--border);
+    font-size: 20px;
+  }
+
+  .weather-bar {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .weather-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .weather-temp {
+    font-family: 'Space Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--cream);
+  }
+  .weather-temp.hot { color: var(--terra); }
+  .weather-temp.warm { color: var(--gold); }
+  .weather-temp.mild { color: #6BBD96; }
+
+  .weather-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .weather-icon { font-size: 18px; }
+
+  /* ── BUDGET TRACKER ── */
+  .budget-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 48px;
+  }
+
+  .budget-totals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .budget-total-item { text-align: center; }
+  .budget-total-item .val {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--gold);
+    display: block;
+  }
+  .budget-total-item .lbl {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-top: 4px;
+  }
+
+  .budget-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .budget-table th {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .budget-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: top;
+  }
+
+  .budget-table tr:last-child td { border-bottom: none; }
+
+  .budget-table .stop-col { color: var(--cream); font-weight: 500; }
+  .budget-table .date-col { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
+  .budget-table .nights-col { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); text-align: center; }
+  .budget-table .est-col { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--gold); text-align: right; }
+  .budget-table .pp-col { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); text-align: right; }
+
+  .budget-input-row input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--cream);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    padding: 4px 8px;
+    width: 90px;
+    text-align: right;
+  }
+  .budget-input-row input:focus { outline: 1px solid var(--gold); }
+
+  /* ── WORLD CUP ── */
+  .wc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .wc-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .wc-date {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+
+  .wc-match {
+    font-size: 14px;
+    color: var(--cream);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .wc-venue {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .wc-note {
+    font-size: 12px;
+    color: var(--cream);
+    opacity: 0.7;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    margin-top: 8px;
+  }
+
+  .wc-stage {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(232,197,71,0.15);
+    color: var(--gold);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── PERMIT ALERTS ── */
+  .permit-alert {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: rgba(196,92,58,0.1);
+    border: 1px solid rgba(196,92,58,0.3);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+
+  .permit-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .permit-text strong {
+    display: block;
+    font-size: 13px;
+    color: var(--terra);
+    margin-bottom: 2px;
+  }
+
+  .permit-text p { font-size: 12px; color: var(--cream); opacity: 0.8; }
+
+  /* ── ROUTE OVERVIEW ── */
+  .route-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+
+  .route-mini-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .route-mini-card:hover { border-color: rgba(232,197,71,0.3); background: var(--surface2); }
+
+  .mini-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    width: 24px;
+    flex-shrink: 0;
+  }
+
+  .mini-info { flex: 1; }
+
+  .mini-name {
+    font-size: 13px;
+    color: var(--cream);
+    font-weight: 600;
+  }
+
+  .mini-date {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .mini-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .main-layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .content { padding: 32px 0; }
+    .stop-body-grid { grid-template-columns: 1fr; }
+    .stop-section { border-right: none; border-top: 1px solid var(--border); }
+    .stop-section:first-child { border-top: none; }
+  }
+
+  /* ── UTILS ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 48px 0;
+  }
+
+  /* Print / private note */
+  .private-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 32px;
+  }
+
+  .private-badge::before { content: '🔒'; font-size: 10px; }
+</style>
+</head>
+<body>
+
+<div class="region-bg" id="region-bg"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-road"></div>
+  <div class="private-badge">Private · For your eyes only</div>
+  <p class="hero-eyebrow">Washington D.C. → Los Angeles · Summer 2026</p>
+  <h1>The Road<br><span>Trip.</span></h1>
+  <p class="hero-sub">July 3 – August 4 &nbsp;·&nbsp; 25 Stops &nbsp;·&nbsp; 32 Nights &nbsp;·&nbsp; ~5,500 Miles</p>
+
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="val">25</span><span class="lbl">Stops</span></div>
+    <div class="hero-stat"><span class="val">32</span><span class="lbl">Nights</span></div>
+    <div class="hero-stat"><span class="val">5,500</span><span class="lbl">Miles</span></div>
+    <div class="hero-stat"><span class="val">91</span><span class="lbl">/ 100</span></div>
+  </div>
+
+  <div class="countdown-box" id="countdown">
+    <div class="countdown-unit"><span class="num" id="cd-days">--</span><span class="lbl">Days</span></div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-unit"><span class="num" id="cd-hours">--</span><span class="lbl">Hours</span></div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-unit"><span class="num" id="cd-mins">--</span><span class="lbl">Mins</span></div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-unit"><span class="num" id="cd-secs">--</span><span class="lbl">Secs</span></div>
+  </div>
+
+  <div class="scroll-hint">scroll to explore</div>
+</section>
+
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-title">Route</div>
+    <div class="route-line-wrap">
+      <div class="route-line"></div>
+      <a class="sidebar-stop" href="#stop-1"><div class="stop-dot"></div><span class="stop-num">01</span>Washington D.C.</a>
+      <a class="sidebar-stop" href="#stop-2"><div class="stop-dot"></div><span class="stop-num">02</span>Philadelphia</a>
+      <a class="sidebar-stop" href="#stop-3"><div class="stop-dot"></div><span class="stop-num">03</span>Shenandoah NP</a>
+      <a class="sidebar-stop" href="#stop-4"><div class="stop-dot"></div><span class="stop-num">04</span>Asheville</a>
+      <a class="sidebar-stop" href="#stop-5"><div class="stop-dot"></div><span class="stop-num">05</span>Great Smoky Mtns</a>
+      <a class="sidebar-stop" href="#stop-6"><div class="stop-dot"></div><span class="stop-num">06</span>Nashville</a>
+      <a class="sidebar-stop" href="#stop-7"><div class="stop-dot"></div><span class="stop-num">07</span>Memphis</a>
+      <a class="sidebar-stop" href="#stop-8"><div class="stop-dot"></div><span class="stop-num">08</span>Louisville</a>
+      <a class="sidebar-stop" href="#stop-9"><div class="stop-dot"></div><span class="stop-num">09</span>Chicago</a>
+      <a class="sidebar-stop" href="#stop-10"><div class="stop-dot"></div><span class="stop-num">10</span>St. Louis</a>
+      <a class="sidebar-stop" href="#stop-11"><div class="stop-dot"></div><span class="stop-num">11</span>Kansas City</a>
+      <a class="sidebar-stop" href="#stop-12"><div class="stop-dot"></div><span class="stop-num">12</span>Denver / Boulder</a>
+      <a class="sidebar-stop" href="#stop-13"><div class="stop-dot"></div><span class="stop-num">13</span>Rocky Mountain NP</a>
+      <a class="sidebar-stop" href="#stop-14"><div class="stop-dot"></div><span class="stop-num">14</span>Moab / Arches</a>
+      <a class="sidebar-stop" href="#stop-15"><div class="stop-dot"></div><span class="stop-num">15</span>Bryce Canyon</a>
+      <a class="sidebar-stop" href="#stop-16"><div class="stop-dot"></div><span class="stop-num">16</span>Zion NP</a>
+      <a class="sidebar-stop" href="#stop-17"><div class="stop-dot"></div><span class="stop-num">17</span>Monument Valley</a>
+      <a class="sidebar-stop" href="#stop-18"><div class="stop-dot"></div><span class="stop-num">18</span>Page, Arizona</a>
+      <a class="sidebar-stop" href="#stop-19"><div class="stop-dot"></div><span class="stop-num">19</span>Grand Canyon</a>
+      <a class="sidebar-stop" href="#stop-20"><div class="stop-dot"></div><span class="stop-num">20</span>Sedona</a>
+      <a class="sidebar-stop" href="#stop-21"><div class="stop-dot"></div><span class="stop-num">21</span>Scottsdale</a>
+      <a class="sidebar-stop" href="#stop-22"><div class="stop-dot"></div><span class="stop-num">22</span>Mammoth Lakes</a>
+      <a class="sidebar-stop" href="#stop-23"><div class="stop-dot"></div><span class="stop-num">23</span>Lake Tahoe / Reno</a>
+      <a class="sidebar-stop" href="#stop-24"><div class="stop-dot"></div><span class="stop-num">24</span>San Francisco</a>
+      <a class="sidebar-stop" href="#stop-25"><div class="stop-dot"></div><span class="stop-num">25</span>Los Angeles</a>
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- QUICK JUMP MAP -->
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">Full Route</p>
+        <h2 class="section-title">25 Stops at a Glance</h2>
+      </div>
+    </div>
+
+    <div class="route-overview">
+      <a class="route-mini-card" href="#stop-1"><span class="mini-num">01</span><div class="mini-info"><div class="mini-name">Washington D.C.</div><div class="mini-date">Jul 3–4</div></div><div class="mini-dot" style="background:#7BB8D8"></div></a>
+      <a class="route-mini-card" href="#stop-2"><span class="mini-num">02</span><div class="mini-info"><div class="mini-name">Philadelphia</div><div class="mini-date">Jul 5</div></div><div class="mini-dot" style="background:#7BB8D8"></div></a>
+      <a class="route-mini-card" href="#stop-3"><span class="mini-num">03</span><div class="mini-info"><div class="mini-name">Shenandoah NP</div><div class="mini-date">Jul 6</div></div><div class="mini-dot" style="background:#6BBD96"></div></a>
+      <a class="route-mini-card" href="#stop-4"><span class="mini-num">04</span><div class="mini-info"><div class="mini-name">Asheville</div><div class="mini-date">Jul 7–8</div></div><div class="mini-dot" style="background:#6BBD96"></div></a>
+      <a class="route-mini-card" href="#stop-5"><span class="mini-num">05</span><div class="mini-info"><div class="mini-name">Great Smoky Mtns</div><div class="mini-date">Jul 9</div></div><div class="mini-dot" style="background:#6BBD96"></div></a>
+      <a class="route-mini-card" href="#stop-6"><span class="mini-num">06</span><div class="mini-info"><div class="mini-name">Nashville</div><div class="mini-date">Jul 10–11</div></div><div class="mini-dot" style="background:#B88AD8"></div></a>
+      <a class="route-mini-card" href="#stop-7"><span class="mini-num">07</span><div class="mini-info"><div class="mini-name">Memphis</div><div class="mini-date">Jul 12</div></div><div class="mini-dot" style="background:#B88AD8"></div></a>
+      <a class="route-mini-card" href="#stop-8"><span class="mini-num">08</span><div class="mini-info"><div class="mini-name">Louisville</div><div class="mini-date">Jul 13</div></div><div class="mini-dot" style="background:#D8C56B"></div></a>
+      <a class="route-mini-card" href="#stop-9"><span class="mini-num">09</span><div class="mini-info"><div class="mini-name">Chicago</div><div class="mini-date">Jul 14–15</div></div><div class="mini-dot" style="background:#7BB8D8"></div></a>
+      <a class="route-mini-card" href="#stop-10"><span class="mini-num">10</span><div class="mini-info"><div class="mini-name">St. Louis</div><div class="mini-date">Jul 16</div></div><div class="mini-dot" style="background:#D8C56B"></div></a>
+      <a class="route-mini-card" href="#stop-11"><span class="mini-num">11</span><div class="mini-info"><div class="mini-name">Kansas City</div><div class="mini-date">Jul 17</div></div><div class="mini-dot" style="background:#D8C56B"></div></a>
+      <a class="route-mini-card" href="#stop-12"><span class="mini-num">12</span><div class="mini-info"><div class="mini-name">Denver / Boulder</div><div class="mini-date">Jul 18–19</div></div><div class="mini-dot" style="background:#6BBD96"></div></a>
+      <a class="route-mini-card" href="#stop-13"><span class="mini-num">13</span><div class="mini-info"><div class="mini-name">Rocky Mountain NP</div><div class="mini-date">Jul 20</div></div><div class="mini-dot" style="background:#6BBD96"></div></a>
+      <a class="route-mini-card" href="#stop-14"><span class="mini-num">14</span><div class="mini-info"><div class="mini-name">Moab / Arches</div><div class="mini-date">Jul 21–22</div></div><div class="mini-dot" style="background:#E8895A"></div></a>
+      <a class="route-mini-card" href="#stop-15"><span class="mini-num">15</span><div class="mini-info"><div class="mini-name">Bryce Canyon</div><div class="mini-date">Jul 23</div></div><div class="mini-dot" style="background:#E8895A"></div></a>
+      <a class="route-mini-card" href="#stop-16"><span class="mini-num">16</span><div class="mini-info"><div class="mini-name">Zion NP</div><div class="mini-date">Jul 24</div></div><div class="mini-dot" style="background:#6BBD96"></div></a>
+      <a class="route-mini-card" href="#stop-17"><span class="mini-num">17</span><div class="mini-info"><div class="mini-name">Monument Valley</div><div class="mini-date">Jul 25</div></div><div class="mini-dot" style="background:#E8895A"></div></a>
+      <a class="route-mini-card" href="#stop-18"><span class="mini-num">18</span><div class="mini-info"><div class="mini-name">Page, Arizona</div><div class="mini-date">Jul 26</div></div><div class="mini-dot" style="background:#E8895A"></div></a>
+      <a class="route-mini-card" href="#stop-19"><span class="mini-num">19</span><div class="mini-info"><div class="mini-name">Grand Canyon</div><div class="mini-date">Jul 27</div></div><div class="mini-dot" style="background:#E8895A"></div></a>
+      <a class="route-mini-card" href="#stop-20"><span class="mini-num">20</span><div class="mini-info"><div class="mini-name">Sedona</div><div class="mini-date">Jul 28</div></div><div class="mini-dot" style="background:#E8895A"></div></a>
+      <a class="route-mini-card" href="#stop-21"><span class="mini-num">21</span><div class="mini-info"><div class="mini-name">Scottsdale</div><div class="mini-date">Jul 29</div></div><div class="mini-dot" style="background:#B88AD8"></div></a>
+      <a class="route-mini-card" href="#stop-22"><span class="mini-num">22</span><div class="mini-info"><div class="mini-name">Mammoth Lakes</div><div class="mini-date">Jul 30</div></div><div class="mini-dot" style="background:#6BBD96"></div></a>
+      <a class="route-mini-card" href="#stop-23"><span class="mini-num">23</span><div class="mini-info"><div class="mini-name">Lake Tahoe / Reno</div><div class="mini-date">Jul 31–Aug 1</div></div><div class="mini-dot" style="background:#6BBD96"></div></a>
+      <a class="route-mini-card" href="#stop-24"><span class="mini-num">24</span><div class="mini-info"><div class="mini-name">San Francisco</div><div class="mini-date">Aug 2</div></div><div class="mini-dot" style="background:#7BB8D8"></div></a>
+      <a class="route-mini-card" href="#stop-25"><span class="mini-num">25</span><div class="mini-info"><div class="mini-name">Los Angeles</div><div class="mini-date">Aug 3–4</div></div><div class="mini-dot" style="background:#B88AD8"></div></a>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- WORLD CUP -->
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">World Cup 2026</p>
+        <h2 class="section-title">Games on the Route</h2>
+      </div>
+    </div>
+
+    <div class="wc-grid">
+      <div class="wc-card">
+        <div class="wc-date">Jul 5 · Philadelphia</div>
+        <div class="wc-stage">Round of 16</div>
+        <div class="wc-match">R16 Match · Lincoln Financial Field</div>
+        <div class="wc-venue">Philadelphia, PA</div>
+        <div class="wc-note">🎉 You arrive Jul 5 — city still buzzing from the previous day's match. Bars will be packed.</div>
+      </div>
+      <div class="wc-card">
+        <div class="wc-date">Jul 10–11 · Nashville</div>
+        <div class="wc-stage">QF / SF Atmosphere</div>
+        <div class="wc-match">Quarter & Semi-Final Week</div>
+        <div class="wc-venue">Every bar on Broadway</div>
+        <div class="wc-note">⚽ Nashville had no host matches, but Broadway honky-tonks will have every game on. Electric atmosphere.</div>
+      </div>
+      <div class="wc-card">
+        <div class="wc-date">Jul 12 · Memphis</div>
+        <div class="wc-stage">QF / SF Atmosphere</div>
+        <div class="wc-match">Knockout Stage Viewing</div>
+        <div class="wc-venue">Beale Street bars</div>
+        <div class="wc-note">⚽ Beale Street will be showing every knockout game. Blues + football = one of the best combos on the trip.</div>
+      </div>
+      <div class="wc-card">
+        <div class="wc-date">Jul 14–15 · Chicago</div>
+        <div class="wc-stage">Semi-Final / Final Lead-up</div>
+        <div class="wc-match">Late Knockout Stages</div>
+        <div class="wc-venue">River North & Wrigleyville bars</div>
+        <div class="wc-note">🏆 Tournament reaches its climax during your Chicago stay. Best city on the route to watch football.</div>
+      </div>
+      <div class="wc-card">
+        <div class="wc-date">Jul 19 · Final</div>
+        <div class="wc-stage">World Cup Final</div>
+        <div class="wc-match">World Cup Final — MetLife Stadium, NJ</div>
+        <div class="wc-venue">You'll be in Denver → Rocky Mountains</div>
+        <div class="wc-note">🏆 Final day is Jul 19 — you'll be heading into the Rockies. Watch it in Denver before the drive to Estes Park.</div>
+      </div>
+      <div class="wc-card">
+        <div class="wc-date">Jul 17 · Kansas City</div>
+        <div class="wc-stage">Just Missed</div>
+        <div class="wc-match">KC hosted matches up to Jul 11</div>
+        <div class="wc-venue">Kansas City, MO</div>
+        <div class="wc-note">⚡ You arrive Jul 17 — just after KC's final match (Jul 11), but the energy will still be lingering in the city.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- BUDGET TRACKER -->
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">Trip Finance</p>
+        <h2 class="section-title">Budget Tracker</h2>
+      </div>
+    </div>
+
+    <div class="budget-section">
+      <div class="budget-totals">
+        <div class="budget-total-item"><span class="val" id="total-accom">$0</span><span class="lbl">Accom Total</span></div>
+        <div class="budget-total-item"><span class="val" id="total-pp">$0</span><span class="lbl">Per Person</span></div>
+        <div class="budget-total-item"><span class="val">~$1,200</span><span class="lbl">Est. Gas</span></div>
+        <div class="budget-total-item"><span class="val">~$3,000</span><span class="lbl">Est. Food &amp; Activities</span></div>
+        <div class="budget-total-item"><span class="val" id="grand-total">~$0</span><span class="lbl">Est. Grand Total (pp)</span></div>
+      </div>
+
+      <table class="budget-table">
+        <thead>
+          <tr>
+            <th>Stop</th>
+            <th>Dates</th>
+            <th style="text-align:center">Nights</th>
+            <th style="text-align:right">Accom Cost ($)</th>
+            <th style="text-align:right">Per Person</th>
+          </tr>
+        </thead>
+        <tbody id="budget-tbody">
+          <!-- Rows injected by JS -->
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);padding-top:12px">TOTAL</td>
+            <td class="est-col" id="budget-accom-total" style="padding-top:12px;border-top:1px solid var(--border)">$0</td>
+            <td class="pp-col" id="budget-pp-total" style="padding-top:12px;border-top:1px solid var(--border)">$0</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- PERMIT ALERTS -->
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">Book Immediately</p>
+        <h2 class="section-title">Permit &amp; Booking Alerts</h2>
+      </div>
+    </div>
+
+    <div style="margin-bottom:48px">
+      <div class="permit-alert">
+        <div class="permit-icon">⚠️</div>
+        <div class="permit-text"><strong>Zion National Park · Jul 24</strong><p>Timed-entry reservations required in summer. Book on recreation.gov the moment your date window opens. The Lodge sells out months in advance.</p></div>
+      </div>
+      <div class="permit-alert">
+        <div class="permit-icon">⚠️</div>
+        <div class="permit-text"><strong>Arches National Park · Jul 21–22</strong><p>Timed-entry tickets required May–September. Book on recreation.gov. Entry windows fill within minutes of opening.</p></div>
+      </div>
+      <div class="permit-alert">
+        <div class="permit-icon">⚠️</div>
+        <div class="permit-text"><strong>Shenandoah NP — Skyland/Big Meadows Lodge · Jul 6</strong><p>Park lodges sell out months ahead in July. Book Skyland or Big Meadows Lodge immediately at goshenandoah.com.</p></div>
+      </div>
+      <div class="permit-alert">
+        <div class="permit-icon">⚠️</div>
+        <div class="permit-text"><strong>Monument Valley — The View Hotel · Jul 25</strong><p>The only hotel inside the park with Mittens views. Sells out completely in summer. Book now.</p></div>
+      </div>
+      <div class="permit-alert">
+        <div class="permit-icon">⚠️</div>
+        <div class="permit-text"><strong>Rocky Mountain NP · Jul 20</strong><p>Timed-entry permits required for Bear Lake Corridor and Trail Ridge Road peak hours. Check recreation.gov for current year's system.</p></div>
+      </div>
+    </div>
+
+    <!-- ── STAMP COLLECTION ── -->
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">Gamified</p>
+        <h2 class="section-title">Stamp Collection</h2>
+      </div>
+    </div>
+
+    <div class="stamps-section">
+      <div class="stamps-progress">
+        <div class="stamps-progress-bar"><div class="stamps-progress-fill" id="stamps-fill" style="width:0%"></div></div>
+        <div class="stamps-count"><span id="stamps-collected">0</span> / 25 collected</div>
+      </div>
+      <p class="stamps-intro">Tap a stamp when you've visited. Saves in your browser.</p>
+      <div class="stamps-grid" id="stamps-grid"></div>
+    </div>
+
+    <!-- ── POSTCARD GENERATOR ── -->
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">AI-Powered</p>
+        <h2 class="section-title">Postcard Generator</h2>
+      </div>
+    </div>
+
+    <div class="postcard-section">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Pick a stop and generate a handwritten-style postcard from that location. Screenshot and send it.</p>
+      <div class="postcard-controls">
+        <select class="postcard-select" id="postcard-stop-select">
+          <option value="">— Choose a stop —</option>
+        </select>
+        <button class="postcard-btn" id="postcard-btn" onclick="generatePostcard()">✉ Write Postcard</button>
+      </div>
+      <div class="postcard-loading" id="postcard-loading">Writing your postcard from the road...</div>
+      <div class="postcard-output" id="postcard-output">
+        <div class="postcard-inner">
+          <div class="postcard-left" id="postcard-left">
+            <div>
+              <div class="postcard-region-label" id="pc-region">Region</div>
+              <div class="postcard-stop-name" id="pc-stopname">Stop Name</div>
+              <div class="postcard-emoji-large" id="pc-emoji">🏙️</div>
+            </div>
+            <div class="postcard-date-label" id="pc-date">DC → LA · 2026</div>
+          </div>
+          <div class="postcard-right">
+            <div class="postcard-lines">
+              <p class="postcard-message" id="pc-message">Your postcard message will appear here...</p>
+            </div>
+            <div class="postcard-address-block">
+              <div class="postcard-stamp-corner">✉️</div>
+              <div class="postcard-address-lines">
+                Friends &amp; Family<br>
+                Somewhere in England<br>
+                United Kingdom
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LIVE WEATHER ── -->
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">Live Data</p>
+        <h2 class="section-title">Weather Right Now</h2>
+      </div>
+    </div>
+
+    <div class="live-weather-section">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Current conditions at key stops along the route — pulled live.</p>
+      <div class="weather-grid" id="weather-grid"></div>
+      <p class="lw-note">* Data from Open-Meteo · updates on page load</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- STOP CARDS -->
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">Stop by Stop</p>
+        <h2 class="section-title">Full Itinerary</h2>
+      </div>
+    </div>
+
+    <!-- ── STOP 1 ── -->
+    <div class="stop-card" id="stop-1">
+      <div class="stop-card-header" onclick="toggleCard(this)">
+        <span class="stop-number">01</span>
+        <div class="stop-meta">
+          <div class="stop-name">Washington, D.C.</div>
+          <div class="stop-info-row">
+            <span class="stop-date">Jul 3–4</span>
+            <span class="stop-nights">2 nights</span>
+            <div class="stop-tags"><span class="tag tag-city">City</span></div>
+          </div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="stop-card-body">
+        <div class="stop-body-grid">
+          <div class="stop-section">
+            <div class="stop-section-title">🏨 Accommodation</div>
+            <div class="hotel-option"><span class="hotel-rank">TOP</span><span class="hotel-name">The Watergate Hotel</span><span class="hotel-price">~$320/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">MID</span><span class="hotel-name">Kimpton Hotel Monaco</span><span class="hotel-price">~$240/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">$</span><span class="hotel-name">Harrington Hotel</span><span class="hotel-price">~$140/nt</span></div>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🍺 Nightlife &amp; Food</div>
+            <ul class="highlights-list">
+              <li>National Mall for July 4 fireworks — get there by 8pm</li>
+              <li>14th Street NW for bars and dinner (Le Diplomate, Estadio)</li>
+              <li>Georgetown waterfront for drinks with views</li>
+              <li>Ben's Chili Bowl — mandatory late night stop</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">⭐ Don't Miss</div>
+            <ul class="highlights-list">
+              <li>Lincoln Memorial at sunset / July 4 fireworks</li>
+              <li>Library of Congress — stunning interior</li>
+              <li>Capitol Hill neighbourhood walk</li>
+              <li>National Museum of African American History</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🌡️ Weather &amp; 🚗 Drive Out</div>
+            <div class="weather-bar" style="margin-bottom:16px">
+              <div class="weather-item"><div class="weather-icon">☀️</div><div class="weather-temp warm">89°F / 32°C</div><div class="weather-label">Avg High</div></div>
+              <div class="weather-item"><div class="weather-temp mild">71°F / 22°C</div><div class="weather-label">Avg Low</div></div>
+              <div class="weather-item"><div class="weather-temp">💧 High</div><div class="weather-label">Humidity</div></div>
+            </div>
+            <div class="drive-info">
+              <div class="drive-stat"><span class="val">140 mi</span><span class="lbl">To Philadelphia</span></div>
+              <div class="drive-sep">|</div>
+              <div class="drive-stat"><span class="val">~2.5 hrs</span><span class="lbl">Drive time</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STOP 2 ── -->
+    <div class="stop-card" id="stop-2">
+      <div class="stop-card-header" onclick="toggleCard(this)">
+        <span class="stop-number">02</span>
+        <div class="stop-meta">
+          <div class="stop-name">Philadelphia</div>
+          <div class="stop-info-row">
+            <span class="stop-date">Jul 5</span>
+            <span class="stop-nights">1 night</span>
+            <div class="stop-tags"><span class="tag tag-city">City</span><span class="tag tag-nightlife">Nightlife</span></div>
+          </div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="stop-card-body">
+        <div class="stop-body-grid">
+          <div class="stop-section">
+            <div class="stop-section-title">🏨 Accommodation</div>
+            <div class="hotel-option"><span class="hotel-rank">TOP</span><span class="hotel-name"><a href="https://www.marriott.com/en-us/hotels/phlak-guild-house-hotel-philadelphia/" target="_blank">Guild House Hotel</a></span><span class="hotel-price">~$200/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">MID</span><span class="hotel-name">Canopy by Hilton Philadelphia CC</span><span class="hotel-price">~$180/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">HOSTEL</span><span class="hotel-name"><a href="https://www.applehostels.com/" target="_blank">Apple Hostels of Philadelphia</a></span><span class="hotel-price">~$70pp</span></div>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🍺 Nightlife &amp; Food</div>
+            <ul class="highlights-list">
+              <li>Fishtown neighbourhood — best bars in the city (Garage, Johnny Brenda's)</li>
+              <li>Reading Terminal Market for lunch — absolute must</li>
+              <li>Pat's vs Geno's cheesesteak debate — try both</li>
+              <li>Old City bar scene near your hostel</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">⭐ Don't Miss</div>
+            <ul class="highlights-list">
+              <li>World Cup post-match buzz in Old City (arrived day after R16)</li>
+              <li>Rocky steps at Philadelphia Museum of Art</li>
+              <li>Liberty Bell — quick but worth it</li>
+              <li>South Street for afternoon wandering</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🌡️ Weather &amp; 🚗 Drive Out</div>
+            <div class="weather-bar" style="margin-bottom:16px">
+              <div class="weather-item"><div class="weather-icon">⛅</div><div class="weather-temp warm">88°F / 31°C</div><div class="weather-label">Avg High</div></div>
+              <div class="weather-item"><div class="weather-temp mild">70°F / 21°C</div><div class="weather-label">Avg Low</div></div>
+            </div>
+            <div class="drive-info">
+              <div class="drive-stat"><span class="val">195 mi</span><span class="lbl">To Shenandoah</span></div>
+              <div class="drive-sep">|</div>
+              <div class="drive-stat"><span class="val">~3.5 hrs</span><span class="lbl">Drive time</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STOP 3 ── -->
+    <div class="stop-card" id="stop-3">
+      <div class="stop-card-header" onclick="toggleCard(this)">
+        <span class="stop-number">03</span>
+        <div class="stop-meta">
+          <div class="stop-name">Shenandoah National Park</div>
+          <div class="stop-info-row">
+            <span class="stop-date">Jul 6</span>
+            <span class="stop-nights">1 night</span>
+            <div class="stop-tags"><span class="tag tag-nature">Nature</span></div>
+          </div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="stop-card-body">
+        <div class="stop-body-grid">
+          <div class="stop-section">
+            <div class="stop-section-title">🏨 Accommodation</div>
+            <div class="hotel-option"><span class="hotel-rank">TOP</span><span class="hotel-name"><a href="https://www.goshenandoah.com/lodging/skyland" target="_blank">Skyland Lodge ⚠️ Book now</a></span><span class="hotel-price">~$165/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">MID</span><span class="hotel-name">Big Meadows Lodge</span><span class="hotel-price">~$180/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">$</span><span class="hotel-name">Hillside Hotel Luray</span><span class="hotel-price">~$115/nt</span></div>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🍺 Food</div>
+            <ul class="highlights-list">
+              <li>Skyland dining room — eat in the park at sunset</li>
+              <li>Luray town for dinner if staying off-park</li>
+              <li>Big Meadows Wayside — casual park lunch spot</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">⭐ Don't Miss</div>
+            <ul class="highlights-list">
+              <li>Skyline Drive — full scenic drive, stop at every overlook</li>
+              <li>Dark Hollow Falls hike (~1.5 miles)</li>
+              <li>Stony Man Summit for panoramic views</li>
+              <li>Sunrise from any overlook — worth the early alarm</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🌡️ Weather &amp; 🚗 Drive Out</div>
+            <div class="weather-bar" style="margin-bottom:16px">
+              <div class="weather-item"><div class="weather-icon">⛅</div><div class="weather-temp mild">82°F / 28°C</div><div class="weather-label">Avg High (at summit)</div></div>
+              <div class="weather-item"><div class="weather-temp mild">60°F / 15°C</div><div class="weather-label">Avg Night</div></div>
+            </div>
+            <div class="drive-info">
+              <div class="drive-stat"><span class="val">155 mi</span><span class="lbl">To Asheville</span></div>
+              <div class="drive-sep">|</div>
+              <div class="drive-stat"><span class="val">~2.5 hrs</span><span class="lbl">Drive time</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STOP 4 ── -->
+    <div class="stop-card" id="stop-4">
+      <div class="stop-card-header" onclick="toggleCard(this)">
+        <span class="stop-number">04</span>
+        <div class="stop-meta">
+          <div class="stop-name">Asheville / Blue Ridge</div>
+          <div class="stop-info-row">
+            <span class="stop-date">Jul 7–8</span>
+            <span class="stop-nights">2 nights</span>
+            <div class="stop-tags"><span class="tag tag-city">City</span><span class="tag tag-nature">Nature</span><span class="tag tag-nightlife">Nightlife</span></div>
+          </div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="stop-card-body">
+        <div class="stop-body-grid">
+          <div class="stop-section">
+            <div class="stop-section-title">🏨 Accommodation</div>
+            <div class="hotel-option"><span class="hotel-rank">TOP</span><span class="hotel-name">The Flat Iron Hotel</span><span class="hotel-price">~$230/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">MID</span><span class="hotel-name">Moxy Asheville Downtown</span><span class="hotel-price">~$170/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">HOSTEL</span><span class="hotel-name">Sweet Peas Hostel</span><span class="hotel-price">~$60pp</span></div>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🍺 Nightlife &amp; Food</div>
+            <ul class="highlights-list">
+              <li>Burial Beer Co — best craft brewery in town</li>
+              <li>Wicked Weed Brewing — the other essential stop</li>
+              <li>Biscuit Head for breakfast (queue early)</li>
+              <li>The Bull &amp; Beggar for dinner</li>
+              <li>Downtown Asheville bar crawl — Lexington Ave area</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">⭐ Don't Miss</div>
+            <ul class="highlights-list">
+              <li>Biltmore Estate — America's largest private home</li>
+              <li>Blue Ridge Parkway scenic drive</li>
+              <li>River Arts District (RAD) studios</li>
+              <li>Looking Glass Falls — easy waterfall stop</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🌡️ Weather &amp; 🚗 Drive Out</div>
+            <div class="weather-bar" style="margin-bottom:16px">
+              <div class="weather-item"><div class="weather-icon">⛅</div><div class="weather-temp warm">84°F / 29°C</div><div class="weather-label">Avg High</div></div>
+              <div class="weather-item"><div class="weather-temp mild">64°F / 18°C</div><div class="weather-label">Avg Low</div></div>
+            </div>
+            <div class="drive-info">
+              <div class="drive-stat"><span class="val">60 mi</span><span class="lbl">To Smokies</span></div>
+              <div class="drive-sep">|</div>
+              <div class="drive-stat"><span class="val">~1.5 hrs</span><span class="lbl">Drive time</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STOP 5 ── -->
+    <div class="stop-card" id="stop-5">
+      <div class="stop-card-header" onclick="toggleCard(this)">
+        <span class="stop-number">05</span>
+        <div class="stop-meta">
+          <div class="stop-name">Great Smoky Mountains</div>
+          <div class="stop-info-row">
+            <span class="stop-date">Jul 9</span>
+            <span class="stop-nights">1 night</span>
+            <div class="stop-tags"><span class="tag tag-nature">Nature</span></div>
+          </div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="stop-card-body">
+        <div class="stop-body-grid">
+          <div class="stop-section">
+            <div class="stop-section-title">🏨 Accommodation</div>
+            <div class="hotel-option"><span class="hotel-rank">TOP</span><span class="hotel-name">The Timber at Holly Branch</span><span class="hotel-price">~$210/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">MID</span><span class="hotel-name">Margaritaville Resort Gatlinburg</span><span class="hotel-price">~$250/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">$</span><span class="hotel-name">Gatlinburg Inn</span><span class="hotel-price">~$140/nt</span></div>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🍺 Food</div>
+            <ul class="highlights-list">
+              <li>The Peddler Steakhouse — Gatlinburg classic</li>
+              <li>Ole Smoky Distillery for moonshine tasting</li>
+              <li>Pancake Pantry — legendary Gatlinburg breakfast</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">⭐ Don't Miss</div>
+            <ul class="highlights-list">
+              <li>Clingmans Dome — highest point in the park, sunrise views</li>
+              <li>Laurel Falls — most popular waterfall hike</li>
+              <li>Roaring Fork Motor Nature Trail — stunning scenic drive</li>
+              <li>Newfound Gap overlook at sunset</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🌡️ Weather &amp; 🚗 Drive Out</div>
+            <div class="weather-bar" style="margin-bottom:16px">
+              <div class="weather-item"><div class="weather-icon">⛅</div><div class="weather-temp warm">85°F / 29°C</div><div class="weather-label">Valley High</div></div>
+              <div class="weather-item"><div class="weather-temp mild">70°F / 21°C</div><div class="weather-label">Summit</div></div>
+            </div>
+            <div class="drive-info">
+              <div class="drive-stat"><span class="val">225 mi</span><span class="lbl">To Nashville</span></div>
+              <div class="drive-sep">|</div>
+              <div class="drive-stat"><span class="val">~3.5 hrs</span><span class="lbl">Drive time</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STOP 6 ── -->
+    <div class="stop-card" id="stop-6">
+      <div class="stop-card-header" onclick="toggleCard(this)">
+        <span class="stop-number">06</span>
+        <div class="stop-meta">
+          <div class="stop-name">Nashville</div>
+          <div class="stop-info-row">
+            <span class="stop-date">Jul 10–11</span>
+            <span class="stop-nights">2 nights</span>
+            <div class="stop-tags"><span class="tag tag-nightlife">Nightlife</span><span class="tag tag-city">City</span></div>
+          </div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="stop-card-body">
+        <div class="stop-body-grid">
+          <div class="stop-section">
+            <div class="stop-section-title">🏨 Accommodation</div>
+            <div class="hotel-option"><span class="hotel-rank">TOP</span><span class="hotel-name">Motto by Hilton Nashville Downtown</span><span class="hotel-price">~$205/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">MID</span><span class="hotel-name">Hilton Nashville Downtown</span><span class="hotel-price">~$185/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">$</span><span class="hotel-name">DoubleTree Nashville Downtown</span><span class="hotel-price">~$150/nt</span></div>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🍺 Nightlife &amp; Food</div>
+            <ul class="highlights-list">
+              <li>Broadway honky-tonks — Tootsie's, Robert's Western World, Layla's</li>
+              <li>The 5 Spot in East Nashville for local music</li>
+              <li>Prince's Hot Chicken — the original, non-negotiable</li>
+              <li>Etch or Henley for a proper dinner</li>
+              <li>Pinewood Social for day-drinking with a crowd</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">⭐ Don't Miss</div>
+            <ul class="highlights-list">
+              <li>World Cup knockout games on Broadway — electric atmosphere</li>
+              <li>Ryman Auditorium — take a tour or catch a show</li>
+              <li>East Nashville for a different, hipper side of the city</li>
+              <li>Centennial Park and the full-scale Parthenon replica</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🌡️ Weather &amp; 🚗 Drive Out</div>
+            <div class="weather-bar" style="margin-bottom:16px">
+              <div class="weather-item"><div class="weather-icon">☀️</div><div class="weather-temp hot">92°F / 33°C</div><div class="weather-label">Avg High</div></div>
+              <div class="weather-item"><div class="weather-temp warm">72°F / 22°C</div><div class="weather-label">Avg Low</div></div>
+            </div>
+            <div class="drive-info">
+              <div class="drive-stat"><span class="val">210 mi</span><span class="lbl">To Memphis</span></div>
+              <div class="drive-sep">|</div>
+              <div class="drive-stat"><span class="val">~3 hrs</span><span class="lbl">Drive time</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STOP 7 ── -->
+    <div class="stop-card" id="stop-7">
+      <div class="stop-card-header" onclick="toggleCard(this)">
+        <span class="stop-number">07</span>
+        <div class="stop-meta">
+          <div class="stop-name">Memphis</div>
+          <div class="stop-info-row">
+            <span class="stop-date">Jul 12</span>
+            <span class="stop-nights">1 night</span>
+            <div class="stop-tags"><span class="tag tag-nightlife">Nightlife</span><span class="tag tag-midwest">Blues</span></div>
+          </div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="stop-card-body">
+        <div class="stop-body-grid">
+          <div class="stop-section">
+            <div class="stop-section-title">🏨 Accommodation</div>
+            <div class="hotel-option"><span class="hotel-rank">TOP</span><span class="hotel-name">Hilton Garden Inn Memphis Downtown Beale St</span><span class="hotel-price">~$180/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">MID</span><span class="hotel-name">Hyatt Centric Beale Street Memphis</span><span class="hotel-price">~$195/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">HOSTEL</span><span class="hotel-name">Hostel Memphis (resident cat: Cash)</span><span class="hotel-price">~$45pp</span></div>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🍺 Nightlife &amp; Food</div>
+            <ul class="highlights-list">
+              <li>Beale Street — start here, stay late, World Cup games on everywhere</li>
+              <li>Central BBQ — best BBQ in a BBQ city</li>
+              <li>Gus's World Famous Fried Chicken — unmissable</li>
+              <li>BB King's Blues Club on Beale St for live blues</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">⭐ Don't Miss</div>
+            <ul class="highlights-list">
+              <li>Sun Studio — where Elvis, Cash, and Presley recorded</li>
+              <li>National Civil Rights Museum at the Lorraine Motel</li>
+              <li>Stax Museum of American Soul Music</li>
+              <li>Elvis Presley's Graceland (if you have time)</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🌡️ Weather &amp; 🚗 Drive Out</div>
+            <div class="weather-bar" style="margin-bottom:16px">
+              <div class="weather-item"><div class="weather-icon">☀️</div><div class="weather-temp hot">93°F / 34°C</div><div class="weather-label">Avg High</div></div>
+              <div class="weather-item"><div class="weather-temp warm">74°F / 23°C</div><div class="weather-label">Avg Low</div></div>
+              <div class="weather-item"><div class="weather-temp">💧 Very High</div><div class="weather-label">Humidity</div></div>
+            </div>
+            <div class="drive-info">
+              <div class="drive-stat"><span class="val">380 mi</span><span class="lbl">To Louisville</span></div>
+              <div class="drive-sep">|</div>
+              <div class="drive-stat"><span class="val">~5.5 hrs</span><span class="lbl">Drive time</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STOP 8 ── -->
+    <div class="stop-card" id="stop-8">
+      <div class="stop-card-header" onclick="toggleCard(this)">
+        <span class="stop-number">08</span>
+        <div class="stop-meta">
+          <div class="stop-name">Louisville</div>
+          <div class="stop-info-row">
+            <span class="stop-date">Jul 13</span>
+            <span class="stop-nights">1 night</span>
+            <div class="stop-tags"><span class="tag tag-nightlife">Nightlife</span><span class="tag tag-midwest">Bourbon</span></div>
+          </div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="stop-card-body">
+        <div class="stop-body-grid">
+          <div class="stop-section">
+            <div class="stop-section-title">🏨 Accommodation</div>
+            <div class="hotel-option"><span class="hotel-rank">TOP</span><span class="hotel-name">Hotel Bourre Bonne (Curio by Hilton)</span><span class="hotel-price">~$210/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">MID</span><span class="hotel-name">Louisville Marriott Downtown</span><span class="hotel-price">~$170/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">$</span><span class="hotel-name">Stellar Suites (highest rated in Louisville)</span><span class="hotel-price">~$140/nt</span></div>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🍺 Nightlife &amp; Food</div>
+            <ul class="highlights-list">
+              <li>Whiskey Row — multiple bourbon bars, start at Old Forester</li>
+              <li>Proof on Main for dinner (in the 21c Museum Hotel)</li>
+              <li>NuLu (East Market District) for cocktail bars</li>
+              <li>Hammerheads for a classic Louisville burger</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">⭐ Don't Miss</div>
+            <ul class="highlights-list">
+              <li>Kentucky Bourbon Trail — multiple distillery tours nearby</li>
+              <li>Louisville Slugger Museum &amp; Factory</li>
+              <li>Muhammad Ali Center</li>
+              <li>Big Four Bridge over the Ohio River at sunset</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🌡️ Weather &amp; 🚗 Drive Out</div>
+            <div class="weather-bar" style="margin-bottom:16px">
+              <div class="weather-item"><div class="weather-icon">☀️</div><div class="weather-temp hot">90°F / 32°C</div><div class="weather-label">Avg High</div></div>
+              <div class="weather-item"><div class="weather-temp warm">72°F / 22°C</div><div class="weather-label">Avg Low</div></div>
+            </div>
+            <div class="drive-info">
+              <div class="drive-stat"><span class="val">305 mi</span><span class="lbl">To Chicago</span></div>
+              <div class="drive-sep">|</div>
+              <div class="drive-stat"><span class="val">~4.5 hrs</span><span class="lbl">Drive time</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STOP 9 ── -->
+    <div class="stop-card" id="stop-9">
+      <div class="stop-card-header" onclick="toggleCard(this)">
+        <span class="stop-number">09</span>
+        <div class="stop-meta">
+          <div class="stop-name">Chicago</div>
+          <div class="stop-info-row">
+            <span class="stop-date">Jul 14–15</span>
+            <span class="stop-nights">2 nights</span>
+            <div class="stop-tags"><span class="tag tag-city">City</span><span class="tag tag-nightlife">Nightlife</span></div>
+          </div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="stop-card-body">
+        <div class="stop-body-grid">
+          <div class="stop-section">
+            <div class="stop-section-title">🏨 Accommodation</div>
+            <div class="hotel-option"><span class="hotel-rank">TOP</span><span class="hotel-name">Loews Chicago Hotel</span><span class="hotel-price">~$220/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">MID</span><span class="hotel-name">Kimpton Gray Hotel</span><span class="hotel-price">~$200/nt</span></div>
+            <div class="hotel-option"><span class="hotel-rank">HOSTEL</span><span class="hotel-name">Freehand Chicago (Broken Shaker bar)</span><span class="hotel-price">~$65pp</span></div>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🍺 Nightlife &amp; Food</div>
+            <ul class="highlights-list">
+              <li>World Cup SF/Final atmosphere — every bar in River North showing games</li>
+              <li>Giordano's or Lou Malnati's for deep dish (mandatory)</li>
+              <li>The Violet Hour in Wicker Park — one of America's best cocktail bars</li>
+              <li>Bavette's Bar &amp; Boeuf for a stunning steak dinner</li>
+              <li>Green Mill Jazz Club — Al Capone's old speakeasy</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">⭐ Don't Miss</div>
+            <ul class="highlights-list">
+              <li>Millennium Park and Cloud Gate (The Bean) at dusk</li>
+              <li>Chicago Riverwalk — best in summer</li>
+              <li>Art Institute of Chicago — world class</li>
+              <li>360 Chicago observation deck for city views</li>
+            </ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🌡️ Weather &amp; 🚗 Drive Out</div>
+            <div class="weather-bar" style="margin-bottom:16px">
+              <div class="weather-item"><div class="weather-icon">⛅</div><div class="weather-temp warm">84°F / 29°C</div><div class="weather-label">Avg High</div></div>
+              <div class="weather-item"><div class="weather-temp mild">66°F / 19°C</div><div class="weather-label">Avg Low</div></div>
+            </div>
+            <div class="drive-info">
+              <div class="drive-stat"><span class="val">295 mi</span><span class="lbl">To St. Louis</span></div>
+              <div class="drive-sep">|</div>
+              <div class="drive-stat"><span class="val">~4.5 hrs</span><span class="lbl">Drive time</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STOPS 10–25 condensed for brevity / expandable ── -->
+
+    <div class="stop-card" id="stop-10">
+      <div class="stop-card-header" onclick="toggleCard(this)">
+        <span class="stop-number">10</span>
+        <div class="stop-meta"><div class="stop-name">St. Louis</div><div class="stop-info-row"><span class="stop-date">Jul 16</span><span class="stop-nights">1 night</span><div class="stop-tags"><span class="tag tag-midwest">Midwest</span></div></div></div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="stop-card-body">
+        <div class="stop-body-grid">
+          <div class="stop-section"><div class="stop-section-title">🏨 Accommodation</div><div class="hotel-option"><span class="hotel-rank">TOP</span><span class="hotel-name">Drury Plaza Hotel at The Arch (free dinner + 3 drinks!)</span><span class="hotel-price">~$180/nt</span></div><div class="hotel-option"><span class="hotel-rank">MID</span><span class="hotel-name">Hyatt Regency St. Louis at The Arch</span><span class="hotel-price">~$195/nt</span></div></div>
+          <div class="stop-section"><div class="stop-section-title">🍺 Nightlife &amp; Food</div><ul class="highlights-list"><li>Anheuser-Busch Brewery tour — free beer included</li><li>Soulard neighbourhood for bar-hopping and live music</li><li>Pappy's Smokehouse for BBQ</li></ul></div>
+          <div class="stop-section"><div class="stop-section-title">⭐ Don't Miss</div><ul class="highlights-list"><li>Gateway Arch and tram ride to the top</li><li>Forest Park (bigger than Central Park)</li><li>City Museum — bizarre, wonderful, adults-welcome</li></ul></div>
+          <div class="stop-section"><div class="stop-section-title">🌡️ Weather &amp; 🚗 Drive Out</div><div class="weather-bar" style="margin-bottom:16px"><div class="weather-item"><div class="weather-icon">☀️</div><div class="weather-temp hot">91°F / 33°C</div><div class="weather-label">Avg High</div></div></div><div class="drive-info"><div class="drive-stat"><span class="val">250 mi</span><span class="lbl">To Kansas City</span></div><div class="drive-sep">|</div><div class="drive-stat"><span class="val">~3.5 hrs</span><span class="lbl">Drive time</span></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stop-card" id="stop-11">
+      <div class="stop-card-header" onclick="toggleCard(this)">
+        <span class="stop-number">11</span>
+        <div class="stop-meta"><div class="stop-name">Kansas City</div><div class="stop-info-row"><span class="stop-date">Jul 17</span><span class="stop-nights">1 night</span><div class="stop-tags"><span class="tag tag-nightlife">Nightlife</span><span class="tag tag-midwest">Jazz</span></div></div></div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="stop-card-body">
+        <div class="stop-body-grid">
+          <div class="stop-section"><div class="stop-section-title">🏨 Accommodation</div><div class="hotel-option"><span class="hotel-rank">TOP</span><span class="hotel-name">Cherry Warehouse Hotel (highest rated on entire route)</span><span class="hotel-price">~$185/nt</span></div><div class="hotel-option"><span class="hotel-rank">MID</span><span class="hotel-name">Hotel No Vacancy (rooftop terrace)</span><span class="hotel-price">~$160/nt</span></div><div class="hotel-option"><span class="hotel-rank">$</span><span class="hotel-name">Crowne Plaza Kansas City Downtown</span><span class="hotel-price">~$130/nt</span></div></div>
+          <div class="stop-section"><div class="stop-section-title">🍺 Nightlife &amp; Food</div><ul class="highlights-list"><li>Joe's Kansas City BBQ — non-negotiable stop, possibly the best BBQ in America</li><li>Power &amp; Light District for bar-hopping</li><li>Westport neighbourhood for more local bars</li><li>Green Lady Lounge for late-night jazz</li></ul></div>
+          <div class="stop-section"><div class="stop-section-title">⭐ Don't Miss</div><ul class="highlights-list"><li>National WWI Museum — unexpectedly brilliant</li><li>18th &amp; Vine Jazz District</li><li>Country Club Plaza for a walk</li></ul></div>
+          <div class="stop-section"><div class="stop-section-title">🌡️ Weather &amp; 🚗 Drive Out</div><div class="weather-bar" style="margin-bottom:16px"><div class="weather-item"><div class="weather-icon">☀️</div><div class="weather-temp hot">91°F / 33°C</div><div class="weather-label">Avg High</div></div></div><div class="drive-info"><div class="drive-stat"><span class="val">600 mi</span><span class="lbl">To Denver</span></div><div class="drive-sep">|</div><div class="drive-stat"><span class="val">~8.5 hrs</span><span class="lbl">Drive time</span></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stop-card" id="stop-12">
+      <div class="stop-card-header" onclick="toggleCard(this)">
+        <span class="stop-number">12</span>
+        <div class="stop-meta"><div class="stop-name">Denver / Boulder</div><div class="stop-info-row"><span class="stop-date">Jul 18–19</span><span class="stop-nights">2 nights</span><div class="stop-tags"><span class="tag tag-city">City</span><span class="tag tag-nightlife">Nightlife</span><span class="tag tag-nature">Mountains</span></div></div></div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="stop-card-body">
+        <div class="stop-body-grid">
+          <div class="stop-section"><div class="stop-section-title">🏨 Accommodation</div><div class="hotel-option"><span class="hotel-rank">TOP</span><span class="hotel-name"><a href="https://www.booking.com/hotel/us/hyatt-centric-downtown-denver.html" target="_blank">Hyatt Centric Downtown Denver ✓ Booked</a></span><span class="hotel-price">$625 total</span></div><div class="hotel-option"><span class="hotel-rank">HOSTEL</span><span class="hotel-name">Ember Hostel (jacuzzi + fire pit)</span><span class="hotel-price">~$48pp</span></div><div class="hotel-option"><span class="hotel-rank">HOSTEL</span><span class="hotel-name">Hostel Fish (bar downstairs)</span><span class="hotel-price">~$43pp</span></div></div>
+          <div class="stop-section"><div class="stop-section-title">🍺 Nightlife &amp; Food</div><ul class="highlights-list"><li>World Cup Final (Jul 19) — watch it here before heading to the mountains</li><li>RiNo Art District — best bars and restaurants in Denver</li><li>Larimer Square for cocktails and dinner</li><li>Great Divide Brewing or Tivoli for craft beer</li><li>Root Down for a great brunch before leaving</li></ul></div>
+          <div class="stop-section"><div class="stop-section-title">⭐ Don't Miss</div><ul class="highlights-list"><li>Red Rocks Amphitheatre — even without a show, walk the rocks</li><li>Day trip to Boulder: Pearl Street Mall, mountain views</li><li>Denver Art Museum</li><li>City Park for a morning run with mountain views</li></ul></div>
+          <div class="stop-section"><div class="stop-section-title">🌡️ Weather &amp; 🚗 Drive Out</div><div class="weather-bar" style="margin-bottom:16px"><div class="weather-item"><div class="weather-icon">☀️</div><div class="weather-temp warm">88°F / 31°C</div><div class="weather-label">Avg High</div></div><div class="weather-item"><div class="weather-temp mild">60°F / 15°C</div><div class="weather-label">Avg Low</div></div></div><div class="drive-info"><div class="drive-stat"><span class="val">75 mi</span><span class="lbl">To Rocky Mtn NP</span></div><div class="drive-sep">|</div><div class="drive-stat"><span class="val">~1.5 hrs</span><span class="lbl">Drive time</span></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stops 13–25 condensed -->
+    <div id="remaining-stops">
+      <!-- JS will render these -->
+    </div>
+
+    <div class="divider"></div>
+
+  </main>
+</div>
+
+<script>
+// ── COUNTDOWN ──
+function updateCountdown() {
+  const target = new Date('2026-07-03T00:00:00');
+  const now = new Date();
+  const diff = target - now;
+  if (diff <= 0) {
+    document.getElementById('countdown').innerHTML = '<div style="font-family:Space Mono,monospace;color:var(--gold);font-size:18px">🚗 THE TRIP HAS STARTED!</div>';
+    return;
+  }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cd-days').textContent = String(d).padStart(2,'0');
+  document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
+  document.getElementById('cd-mins').textContent = String(m).padStart(2,'0');
+  document.getElementById('cd-secs').textContent = String(s).padStart(2,'0');
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+// ── CARD TOGGLE ──
+function toggleCard(header) {
+  const card = header.closest('.stop-card');
+  card.classList.toggle('open');
+}
+
+// ── SIDEBAR ACTIVE STATE ──
+const sections = document.querySelectorAll('.stop-card');
+const sidebarLinks = document.querySelectorAll('.sidebar-stop');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      sidebarLinks.forEach(l => {
+        l.classList.toggle('active', l.getAttribute('href') === `#${id}`);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => observer.observe(s));
+
+// ── BUDGET DATA ──
+const stops = [
+  { name: 'Washington D.C.', date: 'Jul 3–4', nights: 2, est: 480 },
+  { name: 'Philadelphia', date: 'Jul 5', nights: 1, est: 200 },
+  { name: 'Shenandoah NP', date: 'Jul 6', nights: 1, est: 165 },
+  { name: 'Asheville', date: 'Jul 7–8', nights: 2, est: 460 },
+  { name: 'Great Smoky Mtns', date: 'Jul 9', nights: 1, est: 210 },
+  { name: 'Nashville', date: 'Jul 10–11', nights: 2, est: 410 },
+  { name: 'Memphis', date: 'Jul 12', nights: 1, est: 180 },
+  { name: 'Louisville', date: 'Jul 13', nights: 1, est: 210 },
+  { name: 'Chicago', date: 'Jul 14–15', nights: 2, est: 440 },
+  { name: 'St. Louis', date: 'Jul 16', nights: 1, est: 180 },
+  { name: 'Kansas City', date: 'Jul 17', nights: 1, est: 185 },
+  { name: 'Denver / Boulder', date: 'Jul 18–19', nights: 3, est: 625, booked: true },
+  { name: 'Rocky Mtn NP', date: 'Jul 20', nights: 1, est: 185 },
+  { name: 'Moab / Arches', date: 'Jul 21–22', nights: 2, est: 505, booked: true },
+  { name: 'Bryce Canyon', date: 'Jul 23', nights: 1, est: 305, booked: true },
+  { name: 'Zion NP', date: 'Jul 24', nights: 1, est: 360, booked: true },
+  { name: 'Monument Valley', date: 'Jul 25', nights: 1, est: 279, booked: true },
+  { name: 'Page, Arizona', date: 'Jul 26', nights: 1, est: 160 },
+  { name: 'Grand Canyon', date: 'Jul 27', nights: 1, est: 171, booked: true },
+  { name: 'Sedona', date: 'Jul 28', nights: 1, est: 235 },
+  { name: 'Scottsdale', date: 'Jul 29–30', nights: 2, est: 410, booked: true },
+  { name: 'Mammoth Lakes', date: 'Jul 30', nights: 1, est: 450, booked: true },
+  { name: 'Lake Tahoe / Reno', date: 'Jul 31–Aug 1', nights: 2, est: 300, booked: true },
+  { name: 'San Francisco', date: 'Aug 2', nights: 1, est: 200 },
+  { name: 'Los Angeles', date: 'Aug 3–4', nights: 2, est: 400 },
+];
+
+function buildBudget() {
+  const tbody = document.getElementById('budget-tbody');
+  let total = 0;
+  stops.forEach((s, i) => {
+    const tr = document.createElement('tr');
+    tr.className = 'budget-input-row';
+    const pp = Math.round(s.est / 2);
+    total += s.est;
+    tr.innerHTML = `
+      <td class="stop-col">${s.name}${s.booked ? ' <span style="color:var(--green);font-size:10px;font-family:Space Mono,monospace">✓ booked</span>' : ''}</td>
+      <td class="date-col">${s.date}</td>
+      <td class="nights-col">${s.nights}</td>
+      <td class="est-col"><input type="number" value="${s.est}" onchange="recalcBudget()" data-idx="${i}"></td>
+      <td class="pp-col" id="pp-${i}">$${pp}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  recalcBudget();
+}
+
+function recalcBudget() {
+  const inputs = document.querySelectorAll('#budget-tbody input');
+  let total = 0;
+  inputs.forEach((inp, i) => {
+    const val = parseFloat(inp.value) || 0;
+    total += val;
+    const pp = Math.round(val / 2);
+    const ppCell = document.getElementById(`pp-${i}`);
+    if (ppCell) ppCell.textContent = `$${pp}`;
+  });
+  const pp = Math.round(total / 2);
+  document.getElementById('total-accom').textContent = `$${total.toLocaleString()}`;
+  document.getElementById('total-pp').textContent = `$${pp.toLocaleString()}`;
+  document.getElementById('budget-accom-total').textContent = `$${total.toLocaleString()}`;
+  document.getElementById('budget-pp-total').textContent = `$${pp.toLocaleString()}`;
+  const grand = pp + 600 + 1500; // gas pp + food/activities pp
+  document.getElementById('grand-total').textContent = `~$${grand.toLocaleString()}`;
+}
+
+// ── REMAINING STOPS (13–25) ──
+const remainingData = [
+  { num: '13', id: 'stop-13', name: 'Rocky Mountain NP', date: 'Jul 20', nights: '1 night', tags: [{cls:'tag-nature',label:'Nature'}],
+    accom: [['TOP','Murphy\'s Resort at Estes Park','~$185/nt'],['MID','Quality Inn near RMNP','~$150/nt']],
+    food: ['Estes Park Main Street for dinner','Bird &amp; Jim restaurant — local favourite','Grab groceries for a park picnic lunch'],
+    miss: ['Trail Ridge Road — highest continuous paved road in the US','Bear Lake loop trail (book timed entry!)','Moraine Park at sunrise for elk','Alpine Visitor Center views'],
+    weather: ['72°F / 22°C','45°F / 7°C at summit'],
+    drive: ['355 mi to Moab','~5.5 hrs'] },
+  { num: '14', id: 'stop-14', name: 'Moab / Arches / Canyonlands', date: 'Jul 21–22', nights: '2 nights', tags: [{cls:'tag-desert',label:'Desert'},{cls:'tag-nature',label:'Nature'}],
+    accom: [['TOP','Hoodoo Moab, Curio by Hilton ✓ Booked','$505 total'],['MID','Wingate by Wyndham Moab','~$175/nt'],['$','Modern Mesa (highest rated in Moab)','~$230/nt']],
+    food: ['Desert Bistro — best dinner in Moab','Moab Brewery for lunch','Jailhouse Café for breakfast'],
+    miss: ['Delicate Arch hike (3 miles) — do it at sunset','Landscape Arch — world\'s longest natural arch','Canyonlands Island in the Sky viewpoints','Colorado River scenic drive (UT-128)'],
+    weather: ['105°F / 41°C','⚠️ Brutal heat. Hike before 8am or after 6pm. Carry 3L water minimum.'],
+    drive: ['130 mi to Bryce Canyon','~2.5 hrs'] },
+  { num: '15', id: 'stop-15', name: 'Bryce Canyon NP', date: 'Jul 23', nights: '1 night', tags: [{cls:'tag-nature',label:'Nature'}],
+    accom: [['TOP','Best Western Plus Bryce Canyon Grand ✓ Booked','~$195/nt'],['MID','Mountain Ridge Cabins (Hatch)','~$170/nt'],['$','Bryce Canyon Country Inn','~$140/nt']],
+    food: ['Best Western breakfast — one of the best on the trip','Hungry Buffalo at Ruby\'s Inn for dinner','Stock up in Panguitch before arriving — limited options'],
+    miss: ['Sunrise at Bryce Point — wake up at 5am, worth it','Queens Garden + Navajo Loop combo hike','Hoodoos from below on the Navajo Loop','Stargazing — one of the darkest skies in the US'],
+    weather: ['75°F / 24°C (elevation 8,000ft)','45°F / 7°C at night — bring a layer'],
+    drive: ['83 mi to Zion','~1.5 hrs'] },
+  { num: '16', id: 'stop-16', name: 'Zion National Park', date: 'Jul 24', nights: '1 night', tags: [{cls:'tag-nature',label:'Nature'}],
+    accom: [['TOP','Zion Lodge ✓ Booked ⚠️','$360/nt'],['MID','Springdale Zion Inn','~$230/nt'],['$','Zion Ponderosa Ranch Resort','~$175/nt']],
+    food: ['Red Rock Grill at Zion Lodge — eat in the park','Spotted Dog Café in Springdale for dinner','Oscar\'s Café in Springdale for breakfast'],
+    miss: ['Angels Landing — most dramatic hike in the US (permit required)','The Narrows — hike up the Virgin River canyon','Canyon Overlook Trail — big views, short hike','Emerald Pools trail for waterfalls'],
+    weather: ['100°F / 38°C at valley floor','Much cooler in The Narrows','⚠️ Book Angels Landing permit on recreation.gov'],
+    drive: ['160 mi to Monument Valley','~2.5 hrs'] },
+  { num: '17', id: 'stop-17', name: 'Monument Valley', date: 'Jul 25', nights: '1 night', tags: [{cls:'tag-desert',label:'Desert'}],
+    accom: [['TOP','The View Hotel ✓ Booked ⚠️','$279/nt'],['MID','Goulding\'s Lodge','~$195/nt'],['$','Hampton Inn Kayenta','~$150/nt']],
+    food: ['The View Hotel restaurant — eat watching the Mittens at sunset','Goulding\'s has a good on-site restaurant','Stock up before arriving — very remote'],
+    miss: ['Wildcat Trail at sunrise — walk among the Mittens yourself','John Ford\'s Point — the most photographed spot in the valley','Navajo-guided jeep tour (book ahead)','Stargazing — unreal sky with zero light pollution'],
+    weather: ['100°F / 38°C','⚠️ Fill up on gas before arriving. Very remote area.'],
+    drive: ['85 mi to Page AZ','~1.5 hrs'] },
+  { num: '18', id: 'stop-18', name: 'Page, Arizona', date: 'Jul 26', nights: '1 night', tags: [{cls:'tag-desert',label:'Desert'}],
+    accom: [['TOP','La Quinta Inn &amp; Suites Page at Lake Powell','~$160/nt'],['MID','Holiday Inn Express Page','~$150/nt'],['$','Courtyard by Marriott Page','~$155/nt']],
+    food: ['Fiesta Mexicana — best restaurant in Page, go early','Ranch House Grille for breakfast','Dam Bar &amp; Grille for a casual dinner'],
+    miss: ['Antelope Canyon — book an official Navajo tour in advance (sells out weeks ahead)','Horseshoe Bend — 1-mile walk, utterly stunning','Glen Canyon Dam overlook','Lake Powell at sunset if you have time'],
+    weather: ['105°F / 41°C','⚠️ Hike Horseshoe Bend early morning only. Antelope Canyon is shaded.'],
+    drive: ['130 mi to Grand Canyon S. Rim','~2.5 hrs'] },
+  { num: '19', id: 'stop-19', name: 'Grand Canyon South Rim', date: 'Jul 27', nights: '1 night', tags: [{cls:'tag-desert',label:'Desert'},{cls:'tag-nature',label:'Nature'}],
+    accom: [['TOP','Maswik Lodge ✓ Booked','$171/nt'],['MID','Inn History Grand Canyon (Williams)','~$180/nt'],['$','Rodeway Inn Williams','~$100/nt']],
+    food: ['El Tovar Dining Room — the best meal on the South Rim (book ahead!)','Bright Angel Restaurant inside the park','Maswik Pizza Pub for casual post-hike dinner'],
+    miss: ['Mather Point at sunrise — set your alarm','Rim Trail walk along the edge','Bright Angel Trail — go 1–2 miles down, no further in July heat','Desert View Watchtower at the eastern rim'],
+    weather: ['90°F / 32°C at rim','120°F+ at canyon floor','⚠️ Never hike to the bottom and back in one July day. Rangers enforce this.'],
+    drive: ['115 mi to Sedona','~2 hrs'] },
+  { num: '20', id: 'stop-20', name: 'Sedona', date: 'Jul 28', nights: '1 night', tags: [{cls:'tag-desert',label:'Desert'}],
+    accom: [['TOP','Hyatt Vacation Club at Pinon Pointe','~$235/nt'],['MID','Best Western Plus Arroyo Roble','~$195/nt'],['BOUTIQUE','Amara Resort &amp; Spa','~$280/nt']],
+    food: ['Elote Café — outstanding modern Mexican, book ahead','Pump House Station — good cocktail bar','Mariposa Latin Inspired Grill for a sunset dinner with red rock views'],
+    miss: ['Cathedral Rock at sunset — one of the most beautiful views in America','Airport Mesa for sunset vortex views','Uptown Sedona galleries and crystal shops (genuinely fun)','Bell Rock hike if energy allows'],
+    weather: ['100°F / 38°C','⚠️ Morning hikes only. Red rocks hold heat. Beautiful in early morning.'],
+    drive: ['115 mi to Scottsdale','~2 hrs'] },
+  { num: '21', id: 'stop-21', name: 'Scottsdale', date: 'Jul 29–30', nights: '1 night', tags: [{cls:'tag-nightlife',label:'Nightlife'},{cls:'tag-city',label:'City'}],
+    accom: [['TOP','Canopy by Hilton Scottsdale Old Town ✓ Booked','$410 total'],['MID','Hilton Garden Inn Scottsdale Old Town','~$175/nt'],['$PLURGE','Caesars Republic Scottsdale','~$300/nt']],
+    food: ['Maple &amp; Ash — stunning wood-fired dinner in Old Town','Steak 44 for an upscale night out','Postino Wine Café for a relaxed late lunch','Sugar Bowl for old-school ice cream after',],
+    miss: ['Old Town Scottsdale bar crawl — start at 8pm when it cools down','Scottsdale Fashion Square rooftop bars','Pool day at your hotel — July deals mean resort pools for fraction of winter cost','Frank Lloyd Wright\'s Taliesin West (morning only)'],
+    weather: ['107°F / 42°C','⚠️ Hottest stop on the trip. Go out after dark. July is off-peak — great deals.'],
+    drive: ['440 mi to Mammoth Lakes','~6.5 hrs'] },
+  { num: '22', id: 'stop-22', name: 'Mammoth Lakes', date: 'Jul 30', nights: '1 night', tags: [{cls:'tag-nature',label:'Nature'}],
+    accom: [['TOP','The Westin Monache Resort ✓ Booked','$450/nt'],['MID','Village Lodge Mammoth','~$230/nt'],['$','Limelight Mammoth','~$230/nt']],
+    food: ['Mammoth Tavern for dinner — local favourite','The Stove for breakfast','Campo Beer and Food — good craft beer garden'],
+    miss: ['Devils Postpile National Monument — short hike, remarkable geology','Minaret Vista viewpoint at sunset','Hot Creek Geological Site (geothermal pools — do not swim, just observe)','June Lake Loop scenic drive'],
+    weather: ['75°F / 24°C (elevation 7,800ft)','55°F / 13°C at night — big temperature swing from Scottsdale'],
+    drive: ['320 mi to Lake Tahoe','~5 hrs'] },
+  { num: '23', id: 'stop-23', name: 'Lake Tahoe / Reno', date: 'Jul 31–Aug 1', nights: '2 nights', tags: [{cls:'tag-nature',label:'Nature'},{cls:'tag-nightlife',label:'Nightlife'}],
+    accom: [['TOP','Coachman Hotel ✓ Booked','TBC'],['MID','Hampton Inn &amp; Suites South Lake Tahoe','~$185/nt'],['$','Tahoe Mountain Inn','~$175/nt']],
+    food: ['Edgewood Restaurant for a lakeside dinner','Sunnyside Resort for lunch on the water','The Cottonwood Restaurant in Truckee','Reno: Louis\' Basque Corner — legendary and cheap'],
+    miss: ['Emerald Bay State Park — most photographed spot on Tahoe','Lake Tahoe kayak or paddleboard rental','Incline Village for a North Shore day','Reno evening: Silver Legacy Casino, Whitney Peak rooftop bar'],
+    weather: ['82°F / 28°C','55°F / 13°C at night','Water temperature ~68°F — swimmable!'],
+    drive: ['200 mi to San Francisco','~3.5 hrs'] },
+  { num: '24', id: 'stop-24', name: 'San Francisco', date: 'Aug 2', nights: '1 night', tags: [{cls:'tag-city',label:'City'},{cls:'tag-nightlife',label:'Nightlife'}],
+    accom: [['HOSTEL','Green Tortoise Hostel (North Beach, legendary)','~$60pp'],['MID','The Marker San Francisco (Union Sq)','~$240/nt'],['MID','Hotel Zelos San Francisco (rooftop)','~$230/nt']],
+    food: ['Swan Oyster Depot for lunch (queue — no reservations)','Zuni Café for roast chicken dinner','Mission District taquerias for late night (La Taqueria)','Bi-Rite Creamery for ice cream in Dolores Park'],
+    miss: ['Golden Gate Bridge walk (Marin Headlands view is better than the bridge itself)','Mission Dolores Park on a sunny afternoon','Ferry Building Marketplace — best food market on the trip','Alcatraz (book well ahead)'],
+    weather: ['65°F / 18°C','55°F / 13°C at night','⚠️ Pack a layer — SF summer is famously cold and foggy in the morning'],
+    drive: ['380 mi to Los Angeles','~6 hrs (or take PCH — 7.5 hrs, far better)'] },
+  { num: '25', id: 'stop-25', name: 'Los Angeles', date: 'Aug 3–4', nights: '2 nights', tags: [{cls:'tag-city',label:'City'},{cls:'tag-nightlife',label:'Nightlife'}],
+    accom: [['TOP','Hotel Figueroa (DTLA rooftop pool)','~$220/nt'],['MID','The LINE LA (Koreatown)','~$200/nt'],['$','Freehand Los Angeles (rooftop + bar)','~$90pp']],
+    food: ['Bestia in DTLA for your final big dinner — book ahead','Grand Central Market for a last lunch','In-N-Out Burger at some point (obviously)','Koreatown at 11pm — best late night food in the city'],
+    miss: ['Griffith Observatory at sunset — best free view in LA','Venice Beach boardwalk','The Getty Center (free, incredible)','PCH drive to Malibu for the last beach day of the trip'],
+    weather: ['83°F / 28°C','65°F / 18°C at night','Much more comfortable than the desert — a genuine relief'],
+    drive: ['End of the road. Drop the car. You\'re done. 🏁',''] },
+];
+
+function buildRemaining() {
+  const container = document.getElementById('remaining-stops');
+  remainingData.forEach(s => {
+    const tagHtml = s.tags.map(t => `<span class="tag ${t.cls}">${t.label}</span>`).join('');
+    const accomHtml = s.accom.map(a => `<div class="hotel-option"><span class="hotel-rank">${a[0]}</span><span class="hotel-name">${a[1]}</span><span class="hotel-price">${a[2]}</span></div>`).join('');
+    const foodHtml = s.food.map(f => `<li>${f}</li>`).join('');
+    const missHtml = s.miss.map(m => `<li>${m}</li>`).join('');
+    const weatherHtml = s.weather.map((w,i) => i===0
+      ? `<div class="weather-item"><div class="weather-icon">🌡️</div><div class="weather-temp ${w.includes('105') || w.includes('107') || w.includes('100') ? 'hot' : w.includes('90') || w.includes('88') || w.includes('91') ? 'warm' : 'mild'}">${w}</div><div class="weather-label">Avg High</div></div>`
+      : `<div class="weather-item"><div class="weather-temp" style="font-size:11px;color:var(--muted)">${w}</div></div>`
+    ).join('');
+
+    container.innerHTML += `
+    <div class="stop-card" id="${s.id}">
+      <div class="stop-card-header" onclick="toggleCard(this)">
+        <span class="stop-number">${s.num}</span>
+        <div class="stop-meta">
+          <div class="stop-name">${s.name}</div>
+          <div class="stop-info-row">
+            <span class="stop-date">${s.date}</span>
+            <span class="stop-nights">${s.nights}</span>
+            <div class="stop-tags">${tagHtml}</div>
+          </div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="stop-card-body">
+        <div class="stop-body-grid">
+          <div class="stop-section">
+            <div class="stop-section-title">🏨 Accommodation</div>
+            ${accomHtml}
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🍺 Nightlife &amp; Food</div>
+            <ul class="highlights-list">${foodHtml}</ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">⭐ Don't Miss</div>
+            <ul class="highlights-list">${missHtml}</ul>
+          </div>
+          <div class="stop-section">
+            <div class="stop-section-title">🌡️ Weather &amp; 🚗 Drive Out</div>
+            <div class="weather-bar" style="margin-bottom:16px">${weatherHtml}</div>
+            ${s.drive[0] ? `<div class="drive-info"><div class="drive-stat"><span class="val">${s.drive[0]}</span><span class="lbl">${s.drive[1] ? 'Next stop' : ''}</span></div>${s.drive[1] ? `<div class="drive-sep">|</div><div class="drive-stat"><span class="val">${s.drive[1]}</span><span class="lbl">Drive time</span></div>` : ''}</div>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  // Re-observe newly added cards
+  document.querySelectorAll('.stop-card').forEach(s => observer.observe(s));
+}
+
+buildBudget();
+buildRemaining();
+
+// ═══════════════════════════════════════════════
+// FEATURE 1: REGION COLOUR SHIFT ON SCROLL
+// ═══════════════════════════════════════════════
+const regionBg = document.getElementById('region-bg');
+
+const regionPalettes = {
+  'east-coast': {
+    bg: 'radial-gradient(ellipse at 30% 40%, rgba(58,107,138,0.12) 0%, transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(42,107,82,0.08) 0%, transparent 50%)',
+    label: 'East Coast'
+  },
+  'appalachia': {
+    bg: 'radial-gradient(ellipse at 50% 50%, rgba(42,107,82,0.18) 0%, transparent 65%), radial-gradient(ellipse at 20% 80%, rgba(42,107,82,0.1) 0%, transparent 40%)',
+    label: 'Appalachia'
+  },
+  'midwest': {
+    bg: 'radial-gradient(ellipse at 60% 40%, rgba(232,197,71,0.12) 0%, transparent 60%), radial-gradient(ellipse at 30% 70%, rgba(216,197,107,0.08) 0%, transparent 50%)',
+    label: 'Midwest'
+  },
+  'mountain': {
+    bg: 'radial-gradient(ellipse at 40% 30%, rgba(42,107,82,0.14) 0%, transparent 55%), radial-gradient(ellipse at 70% 70%, rgba(58,107,138,0.1) 0%, transparent 50%)',
+    label: 'Mountain West'
+  },
+  'desert': {
+    bg: 'radial-gradient(ellipse at 50% 40%, rgba(196,92,58,0.18) 0%, transparent 60%), radial-gradient(ellipse at 20% 70%, rgba(232,197,71,0.1) 0%, transparent 50%)',
+    label: 'Southwest Desert'
+  },
+  'california': {
+    bg: 'radial-gradient(ellipse at 60% 35%, rgba(58,107,138,0.16) 0%, transparent 60%), radial-gradient(ellipse at 30% 75%, rgba(42,107,82,0.1) 0%, transparent 50%)',
+    label: 'California'
+  }
+};
+
+const stopRegions = {
+  'stop-1': 'east-coast', 'stop-2': 'east-coast',
+  'stop-3': 'appalachia', 'stop-4': 'appalachia', 'stop-5': 'appalachia', 'stop-6': 'appalachia',
+  'stop-7': 'midwest', 'stop-8': 'midwest', 'stop-9': 'midwest', 'stop-10': 'midwest', 'stop-11': 'midwest',
+  'stop-12': 'mountain', 'stop-13': 'mountain',
+  'stop-14': 'desert', 'stop-15': 'desert', 'stop-16': 'desert', 'stop-17': 'desert',
+  'stop-18': 'desert', 'stop-19': 'desert', 'stop-20': 'desert', 'stop-21': 'desert',
+  'stop-22': 'california', 'stop-23': 'california', 'stop-24': 'california', 'stop-25': 'california'
+};
+
+let currentRegion = null;
+const regionObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const region = stopRegions[entry.target.id];
+      if (region && region !== currentRegion) {
+        currentRegion = region;
+        regionBg.style.background = regionPalettes[region].bg;
+      }
+    }
+  });
+}, { threshold: 0.2, rootMargin: '-20% 0px -20% 0px' });
+
+document.querySelectorAll('.stop-card').forEach(el => regionObserver.observe(el));
+
+// ═══════════════════════════════════════════════
+// FEATURE 2: STAMP COLLECTION
+// ═══════════════════════════════════════════════
+const stampData = [
+  { id: 'stop-1',  num: '01', name: 'D.C.',         emoji: '🏛️' },
+  { id: 'stop-2',  num: '02', name: 'Philly',        emoji: '🔔' },
+  { id: 'stop-3',  num: '03', name: 'Shenandoah',    emoji: '🌲' },
+  { id: 'stop-4',  num: '04', name: 'Asheville',     emoji: '🍺' },
+  { id: 'stop-5',  num: '05', name: 'Smokies',       emoji: '🏔️' },
+  { id: 'stop-6',  num: '06', name: 'Nashville',     emoji: '🎸' },
+  { id: 'stop-7',  num: '07', name: 'Memphis',       emoji: '🎵' },
+  { id: 'stop-8',  num: '08', name: 'Louisville',    emoji: '🥃' },
+  { id: 'stop-9',  num: '09', name: 'Chicago',       emoji: '🌆' },
+  { id: 'stop-10', num: '10', name: 'St. Louis',     emoji: '🏛️' },
+  { id: 'stop-11', num: '11', name: 'Kansas City',   emoji: '🎷' },
+  { id: 'stop-12', num: '12', name: 'Denver',        emoji: '🏔️' },
+  { id: 'stop-13', num: '13', name: 'Rocky Mtn',     emoji: '🦌' },
+  { id: 'stop-14', num: '14', name: 'Moab',          emoji: '🪨' },
+  { id: 'stop-15', num: '15', name: 'Bryce',         emoji: '🏜️' },
+  { id: 'stop-16', num: '16', name: 'Zion',          emoji: '🏞️' },
+  { id: 'stop-17', num: '17', name: 'Mon. Valley',   emoji: '🗿' },
+  { id: 'stop-18', num: '18', name: 'Page AZ',       emoji: '🌀' },
+  { id: 'stop-19', num: '19', name: 'Grand Canyon',  emoji: '🌄' },
+  { id: 'stop-20', num: '20', name: 'Sedona',        emoji: '🔴' },
+  { id: 'stop-21', num: '21', name: 'Scottsdale',    emoji: '🌵' },
+  { id: 'stop-22', num: '22', name: 'Mammoth',       emoji: '⛰️' },
+  { id: 'stop-23', num: '23', name: 'Tahoe',         emoji: '🏊' },
+  { id: 'stop-24', num: '24', name: 'San Francisco', emoji: '🌉' },
+  { id: 'stop-25', num: '25', name: 'Los Angeles',   emoji: '🎬' },
+];
+
+const STAMP_KEY = 'roadtrip2026_stamps';
+
+function getCollected() {
+  try { return JSON.parse(localStorage.getItem(STAMP_KEY) || '[]'); } catch { return []; }
+}
+
+function saveCollected(arr) {
+  try { localStorage.setItem(STAMP_KEY, JSON.stringify(arr)); } catch {}
+}
+
+function updateStampProgress() {
+  const collected = getCollected();
+  const pct = (collected.length / stampData.length) * 100;
+  document.getElementById('stamps-fill').style.width = pct + '%';
+  document.getElementById('stamps-collected').textContent = collected.length;
+}
+
+function buildStamps() {
+  const grid = document.getElementById('stamps-grid');
+  const collected = getCollected();
+  grid.innerHTML = '';
+  stampData.forEach(s => {
+    const isCollected = collected.includes(s.id);
+    const div = document.createElement('div');
+    div.className = 'stamp' + (isCollected ? ' collected' : '');
+    div.id = 'stamp-' + s.id;
+    div.onclick = () => toggleStamp(s.id);
+    div.innerHTML = `
+      <div class="stamp-inner">
+        <span class="stamp-collected-tick">✓</span>
+        <div class="stamp-emoji">${s.emoji}</div>
+        <div class="stamp-num">${s.num}</div>
+      </div>
+      <div class="stamp-label">${s.name}</div>
+    `;
+    grid.appendChild(div);
+  });
+  updateStampProgress();
+}
+
+function toggleStamp(id) {
+  const collected = getCollected();
+  const idx = collected.indexOf(id);
+  const el = document.getElementById('stamp-' + id);
+  if (idx === -1) {
+    collected.push(id);
+    el.classList.add('collected');
+    el.querySelector('.stamp-inner').classList.add('stamp-pop');
+    setTimeout(() => el.querySelector('.stamp-inner').classList.remove('stamp-pop'), 400);
+  } else {
+    collected.splice(idx, 1);
+    el.classList.remove('collected');
+  }
+  saveCollected(collected);
+  updateStampProgress();
+}
+
+buildStamps();
+
+// Also add "Mark as visited" buttons to each stop card after build
+function addVisitedButtons() {
+  stampData.forEach(s => {
+    const card = document.getElementById(s.id);
+    if (!card) return;
+    const header = card.querySelector('.stop-info-row');
+    if (!header) return;
+    const btn = document.createElement('button');
+    btn.id = 'visit-btn-' + s.id;
+    btn.style.cssText = 'background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;padding:3px 8px;cursor:pointer;transition:all 0.2s;margin-left:4px;letter-spacing:0.08em';
+    btn.textContent = getCollected().includes(s.id) ? '✓ VISITED' : '+ MARK VISITED';
+    btn.style.color = getCollected().includes(s.id) ? 'var(--gold)' : 'var(--muted)';
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      toggleStamp(s.id);
+      const col = getCollected().includes(s.id);
+      btn.textContent = col ? '✓ VISITED' : '+ MARK VISITED';
+      btn.style.color = col ? 'var(--gold)' : 'var(--muted)';
+    };
+    header.appendChild(btn);
+  });
+}
+setTimeout(addVisitedButtons, 100);
+
+// ═══════════════════════════════════════════════
+// FEATURE 3: POSTCARD GENERATOR (Claude API)
+// ═══════════════════════════════════════════════
+const postcardStops = [
+  { value: 'Washington D.C.', region: 'East Coast', emoji: '🏛️', date: 'Jul 3–4', tags: 'monuments, fireworks, history' },
+  { value: 'Philadelphia', region: 'East Coast', emoji: '🔔', date: 'Jul 5', tags: 'history, cheesesteaks, World Cup buzz' },
+  { value: 'Shenandoah NP', region: 'Appalachia', emoji: '🌲', date: 'Jul 6', tags: 'mountain views, Skyline Drive, forests' },
+  { value: 'Asheville', region: 'Appalachia', emoji: '🍺', date: 'Jul 7–8', tags: 'breweries, Blue Ridge, mountain town energy' },
+  { value: 'Great Smoky Mountains', region: 'Appalachia', emoji: '🏔️', date: 'Jul 9', tags: 'waterfalls, mist, hiking, Appalachian wilderness' },
+  { value: 'Nashville', region: 'Appalachia', emoji: '🎸', date: 'Jul 10–11', tags: 'honky-tonks, live music, hot chicken, Broadway' },
+  { value: 'Memphis', region: 'Deep South', emoji: '🎵', date: 'Jul 12', tags: 'Beale Street, blues music, BBQ, Sun Studio' },
+  { value: 'Louisville', region: 'Midwest', emoji: '🥃', date: 'Jul 13', tags: 'bourbon, Whiskey Row, the Kentucky charm' },
+  { value: 'Chicago', region: 'Midwest', emoji: '🌆', date: 'Jul 14–15', tags: 'deep dish, the Bean, lakefront, World Cup atmosphere' },
+  { value: 'St. Louis', region: 'Midwest', emoji: '🏛️', date: 'Jul 16', tags: 'Gateway Arch, free beer at Anheuser-Busch, City Museum' },
+  { value: 'Kansas City', region: 'Midwest', emoji: '🎷', date: 'Jul 17', tags: 'the best BBQ in America, jazz, underrated city energy' },
+  { value: 'Denver / Boulder', region: 'Mountain West', emoji: '🏔️', date: 'Jul 18–19', tags: 'mountains on the horizon, craft beer, Red Rocks, World Cup Final' },
+  { value: 'Rocky Mountain NP', region: 'Mountain West', emoji: '🦌', date: 'Jul 20', tags: 'elk, alpine meadows, Trail Ridge Road, silence' },
+  { value: 'Moab / Arches', region: 'Utah Desert', emoji: '🪨', date: 'Jul 21–22', tags: 'Delicate Arch, red rock, canyon heat, 105 degrees' },
+  { value: 'Bryce Canyon', region: 'Utah', emoji: '🏜️', date: 'Jul 23', tags: 'hoodoos, dark skies, orange spires at sunrise' },
+  { value: 'Zion National Park', region: 'Utah', emoji: '🏞️', date: 'Jul 24', tags: 'The Narrows, Angels Landing, canyon walls, river walking' },
+  { value: 'Monument Valley', region: 'Navajo Nation', emoji: '🗿', date: 'Jul 25', tags: 'the Mittens, Navajo land, the most iconic view in America' },
+  { value: 'Page, Arizona', region: 'Southwest', emoji: '🌀', date: 'Jul 26', tags: 'Antelope Canyon light beams, Horseshoe Bend, Lake Powell' },
+  { value: 'Grand Canyon', region: 'Southwest', emoji: '🌄', date: 'Jul 27', tags: 'South Rim, sunrise, a mile deep, nothing prepares you for it' },
+  { value: 'Sedona', region: 'Southwest', emoji: '🔴', date: 'Jul 28', tags: 'red rocks, Cathedral Rock, vortex energy, desert stillness' },
+  { value: 'Scottsdale', region: 'Southwest', emoji: '🌵', date: 'Jul 29–30', tags: 'Old Town nightlife, desert heat, resorts, cactus everywhere' },
+  { value: 'Mammoth Lakes', region: 'Eastern Sierra', emoji: '⛰️', date: 'Jul 30', tags: 'volcanic peaks, mountain air, Devils Postpile, relief from the desert' },
+  { value: 'Lake Tahoe / Reno', region: 'California / Nevada', emoji: '🏊', date: 'Jul 31–Aug 1', tags: 'crystal blue water, Emerald Bay, casino lights of Reno' },
+  { value: 'San Francisco', region: 'Northern California', emoji: '🌉', date: 'Aug 2', tags: 'Golden Gate, fog, sourdough, the most beautiful city in America' },
+  { value: 'Los Angeles', region: 'Southern California', emoji: '🎬', date: 'Aug 3–4', tags: 'end of the road, Griffith Observatory, Venice Beach, the Pacific' },
+];
+
+// Populate select
+const sel = document.getElementById('postcard-stop-select');
+postcardStops.forEach(s => {
+  const opt = document.createElement('option');
+  opt.value = s.value;
+  opt.textContent = `${s.emoji}  ${s.value} · ${s.date}`;
+  sel.appendChild(opt);
+});
+
+const pcLeftGradients = {
+  'East Coast': 'linear-gradient(135deg, #0D1E2A, #142A1E)',
+  'Appalachia': 'linear-gradient(135deg, #0D1A10, #1A2A0D)',
+  'Deep South': 'linear-gradient(135deg, #1A0D0D, #2A1A0D)',
+  'Midwest': 'linear-gradient(135deg, #1A1500, #2A1A00)',
+  'Mountain West': 'linear-gradient(135deg, #0D1520, #0D2015)',
+  'Utah Desert': 'linear-gradient(135deg, #2A0D0D, #1A1500)',
+  'Utah': 'linear-gradient(135deg, #2A1200, #1A0D0D)',
+  'Navajo Nation': 'linear-gradient(135deg, #2A1800, #1A0D00)',
+  'Southwest': 'linear-gradient(135deg, #2A1000, #1A0D00)',
+  'Eastern Sierra': 'linear-gradient(135deg, #0D1520, #0D1A10)',
+  'California / Nevada': 'linear-gradient(135deg, #0D1520, #0D0D1A)',
+  'Northern California': 'linear-gradient(135deg, #0D1A20, #0D1520)',
+  'Southern California': 'linear-gradient(135deg, #0D1020, #1A0D20)',
+};
+
+async function generatePostcard() {
+  const stopName = document.getElementById('postcard-stop-select').value;
+  if (!stopName) return;
+  const stop = postcardStops.find(s => s.value === stopName);
+  if (!stop) return;
+
+  const btn = document.getElementById('postcard-btn');
+  const loading = document.getElementById('postcard-loading');
+  const output = document.getElementById('postcard-output');
+
+  btn.disabled = true;
+  loading.classList.add('visible');
+  output.classList.remove('visible');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `Write a short postcard message (4–6 sentences) from ${stop.value} (${stop.region}, ${stop.date}) on a US road trip from Washington DC to Los Angeles. The writer is a British couple in their 30s having the trip of their lives in summer 2026. Capture the essence of this specific place: ${stop.tags}. Write in first person, warm and vivid, as if handwriting to friends back home in England. End with a single punchy final sentence. No sign-off or greeting — just the message itself. Keep it under 80 words.`
+        }]
+      })
+    });
+
+    const data = await res.json();
+    const message = data.content?.[0]?.text || 'Wish you were here.';
+
+    // Update postcard UI
+    document.getElementById('pc-region').textContent = stop.region.toUpperCase();
+    document.getElementById('pc-stopname').textContent = stop.value;
+    document.getElementById('pc-emoji').textContent = stop.emoji;
+    document.getElementById('pc-date').textContent = `DC → LA · ${stop.date}`;
+    document.getElementById('pc-message').textContent = message;
+    document.getElementById('postcard-left').style.background = pcLeftGradients[stop.region] || 'linear-gradient(135deg, #0D1117, #1A1117)';
+
+    output.classList.add('visible');
+  } catch(e) {
+    document.getElementById('pc-message').textContent = 'Wish you were here. The road goes on forever.';
+    output.classList.add('visible');
+  }
+
+  loading.classList.remove('visible');
+  btn.disabled = false;
+}
+
+// ═══════════════════════════════════════════════
+// FEATURE 4: LIVE WEATHER (Open-Meteo, no API key)
+// ═══════════════════════════════════════════════
+const weatherStops = [
+  { name: 'Washington D.C.', lat: 38.9072, lon: -77.0369 },
+  { name: 'Nashville', lat: 36.1627, lon: -86.7816 },
+  { name: 'Chicago', lat: 41.8781, lon: -87.6298 },
+  { name: 'Denver', lat: 39.7392, lon: -104.9903 },
+  { name: 'Moab', lat: 38.5733, lon: -109.5498 },
+  { name: 'Grand Canyon', lat: 36.0544, lon: -112.1401 },
+  { name: 'Scottsdale', lat: 33.4942, lon: -111.9261 },
+  { name: 'Las Vegas', lat: 36.1699, lon: -115.1398 },
+  { name: 'San Francisco', lat: 37.7749, lon: -122.4194 },
+  { name: 'Los Angeles', lat: 34.0522, lon: -118.2437 },
+];
+
+const wmoCodes = {
+  0:'Clear sky', 1:'Mainly clear', 2:'Partly cloudy', 3:'Overcast',
+  45:'Foggy', 48:'Icy fog', 51:'Light drizzle', 53:'Drizzle', 55:'Heavy drizzle',
+  61:'Light rain', 63:'Rain', 65:'Heavy rain', 71:'Light snow', 73:'Snow', 75:'Heavy snow',
+  80:'Rain showers', 81:'Heavy showers', 82:'Violent showers',
+  95:'Thunderstorm', 96:'Thunderstorm', 99:'Thunderstorm'
+};
+
+const wmoEmojis = {
+  0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️', 45:'🌫️', 48:'🌫️',
+  51:'🌦️', 53:'🌧️', 55:'🌧️', 61:'🌦️', 63:'🌧️', 65:'🌧️',
+  71:'🌨️', 73:'❄️', 75:'❄️', 80:'🌦️', 81:'⛈️', 82:'⛈️',
+  95:'⛈️', 96:'⛈️', 99:'⛈️'
+};
+
+function celsiusToF(c) { return Math.round(c * 9/5 + 32); }
+
+async function loadWeather() {
+  const grid = document.getElementById('weather-grid');
+  // Build loading skeletons
+  weatherStops.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'live-weather-card';
+    card.id = 'wcard-' + s.name.replace(/\s/g,'');
+    card.innerHTML = `<div class="lw-city">${s.name}</div><div class="lw-loading">loading...</div>`;
+    grid.appendChild(card);
+  });
+
+  // Fetch all in parallel
+  await Promise.all(weatherStops.map(async s => {
+    const card = document.getElementById('wcard-' + s.name.replace(/\s/g,''));
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${s.lat}&longitude=${s.lon}&current=temperature_2m,weathercode&temperature_unit=celsius&timezone=auto`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const tempC = Math.round(data.current.temperature_2m);
+      const tempF = celsiusToF(tempC);
+      const code = data.current.weathercode;
+      const emoji = wmoEmojis[code] || '🌡️';
+      const desc = wmoCodes[code] || 'Unknown';
+      const isHot = tempC >= 35;
+      const isWarm = tempC >= 25;
+      card.innerHTML = `
+        <div class="lw-city">${s.name}</div>
+        <div class="lw-icon">${emoji}</div>
+        <span class="lw-temp" style="color:${isHot ? 'var(--terra)' : isWarm ? 'var(--gold)' : 'var(--cream)'}">${tempF}°F / ${tempC}°C</span>
+        <div class="lw-desc">${desc}</div>
+      `;
+    } catch {
+      card.innerHTML = `<div class="lw-city">${s.name}</div><div class="lw-loading">unavailable</div>`;
+    }
+  }));
+}
+
+loadWeather();</script>
+</body>
+</html>
