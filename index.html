@@ -55,7 +55,7 @@
   }
   .stamps-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(90px, 22vw), 1fr));
     gap: 12px;
   }
   .stamp {
@@ -359,7 +359,7 @@
   }
   .weather-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(160px, 45vw), 1fr));
     gap: 12px;
   }
   .live-weather-card {
@@ -931,11 +931,12 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     width: 100%;
+    max-width: 100%;
   }
 
   .budget-totals {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(150px, 40vw), 1fr));
     gap: 24px;
     margin-bottom: 32px;
   }
@@ -960,6 +961,7 @@
   .budget-table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 420px;
   }
 
   .budget-table th {
@@ -1004,13 +1006,13 @@
   /* ── WORLD CUP ── */
   .wc-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 90vw), 1fr));
     gap: 16px;
   }
 
   .route-overview {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(200px, 44vw), 1fr));
     gap: 12px;
     margin-bottom: 48px;
   }
