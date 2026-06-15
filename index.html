@@ -287,7 +287,63 @@
   }
   .postcard-loading.visible { display: block; }
 
-  /* ── LIVE WEATHER ── */
+  /* Photo upload zone */
+  .photo-upload-zone {
+    border: 2px dashed rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    background: var(--surface2);
+  }
+  .photo-upload-zone:hover { border-color: var(--gold); background: rgba(232,197,71,0.05); }
+  .photo-upload-zone.has-photo { border-color: var(--gold); border-style: solid; }
+  .photo-upload-zone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .photo-upload-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    pointer-events: none;
+  }
+  .photo-upload-label strong { color: var(--gold); display: block; font-size: 13px; margin-bottom: 4px; }
+  .photo-preview-thumb {
+    width: 60px; height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin: 0 auto 8px;
+    display: block;
+    border: 1px solid var(--gold);
+  }
+  /* Postcard left panel with photo */
+  .postcard-left.has-photo {
+    padding: 0;
+    overflow: hidden;
+  }
+  .postcard-photo-bg {
+    position: absolute; inset: 0;
+    object-fit: cover;
+    width: 100%; height: 100%;
+    display: none;
+  }
+  .postcard-left.has-photo .postcard-photo-bg { display: block; }
+  .postcard-photo-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.35) 100%);
+  }
+  .postcard-left.has-photo .postcard-left-content {
+    position: relative; z-index: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+  }
+  .postcard-left-content { height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
   .live-weather-section {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -1058,15 +1114,151 @@
 
   /* ── RESPONSIVE ── */
   @media (max-width: 900px) {
-    .main-layout { grid-template-columns: 1fr; }
+    .main-layout { grid-template-columns: 1fr; padding: 0 16px; }
     .sidebar { display: none; }
-    .content { padding: 32px 0; }
+    .content { padding: 24px 0; }
     .stop-body-grid { grid-template-columns: 1fr; }
     .stop-section { border-right: none; border-top: 1px solid var(--border); }
     .stop-section:first-child { border-top: none; }
+    .section-header { padding-top: 32px; }
+    .section-title { font-size: 22px; }
   }
 
-  /* ── UTILS ── */
+  @media (max-width: 600px) {
+    /* Hero */
+    .hero { padding: 48px 20px 64px; }
+    .hero h1 { font-size: 52px; }
+    .hero-stats { gap: 24px; }
+    .hero-stat .val { font-size: 28px; }
+
+    /* Countdown — stack into 2x2 on very small */
+    .countdown-box {
+      gap: 12px;
+      padding: 16px 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .countdown-unit .num { font-size: 22px; }
+
+    /* Layout */
+    .main-layout { padding: 0 12px; }
+    .content { padding: 20px 0; }
+    .divider { margin: 32px 0; }
+
+    /* Section headers */
+    .section-header { margin-bottom: 20px; padding-top: 24px; }
+    .section-title { font-size: 20px; }
+
+    /* Route overview grid — 2 cols on mobile */
+    .route-overview { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .route-mini-card { padding: 10px 12px; gap: 8px; }
+    .mini-name { font-size: 11px; }
+    .mini-date { font-size: 9px; }
+    .mini-num { font-size: 10px; width: 18px; }
+
+    /* Stop cards */
+    .stop-card-header { padding: 14px 16px; gap: 10px; }
+    .stop-name { font-size: 16px; }
+    .stop-info-row { gap: 8px; }
+    .stop-section { padding: 16px; }
+    .stop-section-full { padding: 16px; }
+
+    /* Budget */
+    .budget-section { padding: 20px 16px; }
+    .budget-totals { grid-template-columns: 1fr 1fr; gap: 16px; }
+    .budget-total-item .val { font-size: 24px; }
+    /* Make budget table scrollable on mobile */
+    .budget-table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 0 -16px;
+      padding: 0 16px;
+    }
+    .budget-table { min-width: 480px; }
+    .budget-input-row input { width: 72px; font-size: 11px; }
+
+    /* Stamps */
+    .stamps-section { padding: 20px 16px; }
+    .stamps-grid { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; }
+    .stamp-inner { width: 68px; height: 68px; }
+    .stamp-emoji { font-size: 20px; }
+
+    /* Postcard */
+    .postcard-section { padding: 20px 16px; }
+    .postcard-controls { flex-direction: column; }
+    .postcard-select { min-width: unset; width: 100%; }
+    .postcard-btn { width: 100%; text-align: center; }
+    .postcard-inner { grid-template-columns: 1fr; }
+    .postcard-left { min-height: 140px; padding: 20px; }
+    .postcard-stop-name { font-size: 18px; }
+    .postcard-right { padding: 20px; }
+    .postcard-message { font-size: 12px; }
+
+    /* Live weather */
+    .live-weather-section { padding: 20px 16px; }
+    .weather-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+    .live-weather-card { padding: 10px; }
+    .lw-temp { font-size: 18px; }
+
+    /* WC grid */
+    .wc-grid { grid-template-columns: 1fr; }
+
+    /* Permit alerts */
+    .permit-alert { padding: 12px 14px; gap: 10px; }
+
+    /* Drive info */
+    .drive-info { gap: 14px; }
+    .drive-stat .val { font-size: 15px; }
+
+    /* Hero stats on very small screens */
+    .hero-stats { gap: 16px; }
+    .hero-stat .val { font-size: 24px; }
+  }
+
+  @media (max-width: 380px) {
+    .hero h1 { font-size: 40px; }
+    .route-overview { grid-template-columns: 1fr; }
+    .stamps-grid { grid-template-columns: repeat(4, 1fr); }
+    .stamp-inner { width: 60px; height: 60px; }
+    .stamp-emoji { font-size: 18px; }
+    .stamp-label { font-size: 7px; }
+  }
+
+  /* ── MOBILE BOTTOM NAV ── */
+  .mobile-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(13,17,23,0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+    z-index: 100;
+    justify-content: space-around;
+  }
+  .mobile-nav a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: var(--muted);
+    text-decoration: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: color 0.2s;
+    min-width: 56px;
+  }
+  .mobile-nav a:hover, .mobile-nav a.active { color: var(--gold); }
+  .mobile-nav a span { font-size: 18px; }
+  @media (max-width: 900px) {
+    .mobile-nav { display: flex; }
+    /* Add bottom padding so content isn't hidden behind nav */
+    .main-layout { padding-bottom: 72px; }
+  }
   .divider {
     height: 1px;
     background: var(--border);
@@ -1264,7 +1456,7 @@
       </div>
     </div>
 
-    <div class="budget-section">
+    <div class="budget-section" id="budget-section-anchor">
       <div class="budget-totals">
         <div class="budget-total-item"><span class="val" id="total-accom">$0</span><span class="lbl">Accom Total</span></div>
         <div class="budget-total-item"><span class="val" id="total-pp">$0</span><span class="lbl">Per Person</span></div>
@@ -1273,6 +1465,7 @@
         <div class="budget-total-item"><span class="val" id="grand-total">~$0</span><span class="lbl">Est. Grand Total (pp)</span></div>
       </div>
 
+      <div class="budget-table-wrap">
       <table class="budget-table">
         <thead>
           <tr>
@@ -1294,7 +1487,7 @@
           </tr>
         </tfoot>
       </table>
-    </div>
+      </div>
 
     <div class="divider"></div>
 
@@ -1337,7 +1530,7 @@
       </div>
     </div>
 
-    <div class="stamps-section">
+    <div class="stamps-section" id="stamps-section-anchor">
       <div class="stamps-progress">
         <div class="stamps-progress-bar"><div class="stamps-progress-fill" id="stamps-fill" style="width:0%"></div></div>
         <div class="stamps-count"><span id="stamps-collected">0</span> / 25 collected</div>
@@ -1354,24 +1547,37 @@
       </div>
     </div>
 
-    <div class="postcard-section">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Pick a stop and generate a handwritten-style postcard from that location. Screenshot and send it.</p>
+    <div class="postcard-section" id="postcard-section-anchor">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Pick a stop, optionally upload a photo, and generate a postcard. Screenshot and send it.</p>
       <div class="postcard-controls">
         <select class="postcard-select" id="postcard-stop-select">
           <option value="">— Choose a stop —</option>
         </select>
         <button class="postcard-btn" id="postcard-btn" onclick="generatePostcard()">✉ Write Postcard</button>
       </div>
+
+      <div class="photo-upload-zone" id="photo-upload-zone" style="margin-bottom:16px">
+        <input type="file" accept="image/*" id="photo-input" onchange="handlePhotoUpload(event)">
+        <div class="photo-upload-label" id="photo-upload-label">
+          <strong>📷 Add a photo (optional)</strong>
+          Tap to upload from your camera roll — replaces the left panel
+        </div>
+      </div>
+
       <div class="postcard-loading" id="postcard-loading">Writing your postcard from the road...</div>
       <div class="postcard-output" id="postcard-output">
         <div class="postcard-inner">
           <div class="postcard-left" id="postcard-left">
-            <div>
-              <div class="postcard-region-label" id="pc-region">Region</div>
-              <div class="postcard-stop-name" id="pc-stopname">Stop Name</div>
-              <div class="postcard-emoji-large" id="pc-emoji">🏙️</div>
+            <img class="postcard-photo-bg" id="postcard-photo-bg" src="" alt="">
+            <div class="postcard-photo-overlay" id="postcard-photo-overlay" style="display:none"></div>
+            <div class="postcard-left-content" id="postcard-left-content">
+              <div>
+                <div class="postcard-region-label" id="pc-region">Region</div>
+                <div class="postcard-stop-name" id="pc-stopname">Stop Name</div>
+                <div class="postcard-emoji-large" id="pc-emoji">🏙️</div>
+              </div>
+              <div class="postcard-date-label" id="pc-date">DC → LA · 2026</div>
             </div>
-            <div class="postcard-date-label" id="pc-date">DC → LA · 2026</div>
           </div>
           <div class="postcard-right">
             <div class="postcard-lines">
@@ -1407,7 +1613,7 @@
     <div class="divider"></div>
 
     <!-- STOP CARDS -->
-    <div class="section-header">
+    <div class="section-header" id="itinerary-section-anchor">
       <div>
         <p class="section-eyebrow">Stop by Stop</p>
         <h2 class="section-title">Full Itinerary</h2>
@@ -2433,7 +2639,6 @@ const postcardStops = [
   { value: 'Los Angeles', region: 'Southern California', emoji: '🎬', date: 'Aug 3–4', tags: 'end of the road, Griffith Observatory, Venice Beach, the Pacific' },
 ];
 
-// Populate select
 const sel = document.getElementById('postcard-stop-select');
 postcardStops.forEach(s => {
   const opt = document.createElement('option');
@@ -2458,6 +2663,57 @@ const pcLeftGradients = {
   'Southern California': 'linear-gradient(135deg, #0D1020, #1A0D20)',
 };
 
+// Photo upload state
+let uploadedPhotoBase64 = null;
+let uploadedPhotoDataUrl = null;
+
+function handlePhotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    uploadedPhotoDataUrl = dataUrl;
+    // Extract base64 without the data:image/...;base64, prefix
+    uploadedPhotoBase64 = dataUrl.split(',')[1];
+
+    // Show thumbnail in upload zone
+    const zone = document.getElementById('photo-upload-zone');
+    const label = document.getElementById('photo-upload-label');
+    zone.classList.add('has-photo');
+    label.innerHTML = `<img class="photo-preview-thumb" src="${dataUrl}" alt="Your photo"><strong style="color:var(--gold)">✓ Photo ready</strong>Tap to change`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyPhotoToPostcard(dataUrl) {
+  const leftPanel = document.getElementById('postcard-left');
+  const photoBg = document.getElementById('postcard-photo-bg');
+  const overlay = document.getElementById('postcard-photo-overlay');
+
+  photoBg.src = dataUrl;
+  photoBg.style.display = 'block';
+  overlay.style.display = 'block';
+  leftPanel.classList.add('has-photo');
+  leftPanel.style.background = 'none';
+
+  // Make text white and visible over photo
+  document.getElementById('pc-region').style.color = '#E8C547';
+  document.getElementById('pc-stopname').style.color = '#ffffff';
+  document.getElementById('pc-date').style.color = 'rgba(255,255,255,0.7)';
+}
+
+function clearPhotoFromPostcard() {
+  const leftPanel = document.getElementById('postcard-left');
+  const photoBg = document.getElementById('postcard-photo-bg');
+  const overlay = document.getElementById('postcard-photo-overlay');
+
+  photoBg.style.display = 'none';
+  overlay.style.display = 'none';
+  leftPanel.classList.remove('has-photo');
+}
+
 async function generatePostcard() {
   const stopName = document.getElementById('postcard-stop-select').value;
   if (!stopName) return;
@@ -2472,6 +2728,20 @@ async function generatePostcard() {
   loading.classList.add('visible');
   output.classList.remove('visible');
 
+  const hasPhoto = !!uploadedPhotoBase64;
+
+  // Build message content — include image if uploaded
+  const textPrompt = hasPhoto
+    ? `Write a short postcard message (4–6 sentences) from ${stop.value} (${stop.region}, ${stop.date}) on a US road trip from Washington DC to Los Angeles. The writer is a British couple in their 30s having the trip of their lives in summer 2026. I'm attaching our actual photo from this location — weave in one specific detail from what you can see in it. Also capture the essence of the place: ${stop.tags}. Write in first person, warm and vivid, as if handwriting to friends back home in England. End with a single punchy final sentence. No sign-off or greeting — just the message itself. Keep it under 85 words.`
+    : `Write a short postcard message (4–6 sentences) from ${stop.value} (${stop.region}, ${stop.date}) on a US road trip from Washington DC to Los Angeles. The writer is a British couple in their 30s having the trip of their lives in summer 2026. Capture the essence of this specific place: ${stop.tags}. Write in first person, warm and vivid, as if handwriting to friends back home in England. End with a single punchy final sentence. No sign-off or greeting — just the message itself. Keep it under 80 words.`;
+
+  const messageContent = hasPhoto
+    ? [
+        { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: uploadedPhotoBase64 } },
+        { type: 'text', text: textPrompt }
+      ]
+    : textPrompt;
+
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -2479,10 +2749,7 @@ async function generatePostcard() {
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: `Write a short postcard message (4–6 sentences) from ${stop.value} (${stop.region}, ${stop.date}) on a US road trip from Washington DC to Los Angeles. The writer is a British couple in their 30s having the trip of their lives in summer 2026. Capture the essence of this specific place: ${stop.tags}. Write in first person, warm and vivid, as if handwriting to friends back home in England. End with a single punchy final sentence. No sign-off or greeting — just the message itself. Keep it under 80 words.`
-        }]
+        messages: [{ role: 'user', content: messageContent }]
       })
     });
 
@@ -2492,14 +2759,24 @@ async function generatePostcard() {
     // Update postcard UI
     document.getElementById('pc-region').textContent = stop.region.toUpperCase();
     document.getElementById('pc-stopname').textContent = stop.value;
-    document.getElementById('pc-emoji').textContent = stop.emoji;
+    document.getElementById('pc-emoji').textContent = hasPhoto ? '' : stop.emoji;
     document.getElementById('pc-date').textContent = `DC → LA · ${stop.date}`;
     document.getElementById('pc-message').textContent = message;
-    document.getElementById('postcard-left').style.background = pcLeftGradients[stop.region] || 'linear-gradient(135deg, #0D1117, #1A1117)';
+
+    if (hasPhoto) {
+      applyPhotoToPostcard(uploadedPhotoDataUrl);
+    } else {
+      clearPhotoFromPostcard();
+      document.getElementById('postcard-left').style.background = pcLeftGradients[stop.region] || 'linear-gradient(135deg, #0D1117, #1A1117)';
+      document.getElementById('pc-region').style.color = '';
+      document.getElementById('pc-stopname').style.color = '';
+      document.getElementById('pc-date').style.color = '';
+    }
 
     output.classList.add('visible');
   } catch(e) {
     document.getElementById('pc-message').textContent = 'Wish you were here. The road goes on forever.';
+    if (hasPhoto) applyPhotoToPostcard(uploadedPhotoDataUrl);
     output.classList.add('visible');
   }
 
@@ -2578,5 +2855,14 @@ async function loadWeather() {
 }
 
 loadWeather();</script>
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav" aria-label="Quick navigation">
+  <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;"><span>🗺️</span>Top</a>
+  <a href="#budget-section-anchor"><span>💰</span>Budget</a>
+  <a href="#stamps-section-anchor"><span>🏷️</span>Stamps</a>
+  <a href="#postcard-section-anchor"><span>✉️</span>Postcard</a>
+  <a href="#itinerary-section-anchor"><span>📍</span>Stops</a>
+</nav>
+
 </body>
 </html>
