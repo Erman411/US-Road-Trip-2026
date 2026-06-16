@@ -22,9 +22,9 @@
   .hero-stats, .hero-stat, .countdown-box, .countdown-unit,
   .route-overview, .route-mini-card, .mini-info,
   .wc-grid, .wc-card, .budget-totals, .budget-total-item,
-  .stamps-grid, .stamp, .stamps-progress,
   .weather-grid, .live-weather-card,
   .postcard-controls, .postcard-output, .postcard-inner, .postcard-left, .postcard-right,
+  .text-input-zone, .postcard-save-row,
   .drive-info, .drive-stat, .weather-bar, .weather-item,
   .stop-body-grid, .stop-section,
   .mobile-nav {
@@ -57,122 +57,6 @@
     opacity: 1;
   }
   .main-layout, .hero, nav, main { position: relative; z-index: 1; }
-
-  /* ── STAMP COLLECTION ── */
-  .stamps-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 32px;
-    margin-bottom: 48px;
-  }
-  .stamps-intro {
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 24px;
-  }
-  .stamps-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(90px, 22vw), 1fr));
-    gap: 12px;
-  }
-  .stamp {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    transition: transform 0.2s;
-    user-select: none;
-  }
-  .stamp:hover { transform: scale(1.05); }
-  .stamp-inner {
-    width: 80px; height: 80px;
-    border-radius: 4px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    border: 2px dashed rgba(255,255,255,0.15);
-    background: var(--surface2);
-    position: relative;
-    transition: all 0.4s ease;
-    overflow: hidden;
-  }
-  .stamp-inner::before {
-    content: '';
-    position: absolute;
-    inset: 3px;
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 2px;
-  }
-  .stamp.collected .stamp-inner {
-    border-color: var(--gold);
-    border-style: solid;
-    background: linear-gradient(135deg, rgba(232,197,71,0.15), rgba(196,92,58,0.1));
-    box-shadow: 0 0 16px rgba(232,197,71,0.2);
-  }
-  .stamp-emoji { font-size: 24px; filter: grayscale(1); opacity: 0.3; transition: all 0.4s; }
-  .stamp.collected .stamp-emoji { filter: grayscale(0); opacity: 1; }
-  .stamp-num {
-    font-family: 'Space Mono', monospace;
-    font-size: 8px;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-  }
-  .stamp.collected .stamp-num { color: var(--gold); }
-  .stamp-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 8px;
-    color: var(--muted);
-    text-align: center;
-    line-height: 1.3;
-    max-width: 80px;
-  }
-  .stamp.collected .stamp-label { color: var(--cream); }
-  .stamp-collected-tick {
-    position: absolute;
-    top: 3px; right: 5px;
-    font-size: 9px;
-    color: var(--gold);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .stamp.collected .stamp-collected-tick { opacity: 1; }
-  .stamp-pop {
-    animation: stampPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  @keyframes stampPop {
-    0% { transform: scale(0.8); opacity: 0.5; }
-    60% { transform: scale(1.15); }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  .stamps-progress {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 20px;
-  }
-  .stamps-progress-bar {
-    flex: 1;
-    height: 4px;
-    background: var(--surface2);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .stamps-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--gold), var(--terra));
-    border-radius: 2px;
-    transition: width 0.5s ease;
-  }
-  .stamps-count {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--gold);
-    white-space: nowrap;
-  }
 
   /* ── POSTCARD GENERATOR ── */
   .postcard-section {
@@ -343,6 +227,59 @@
     display: block;
     border: 1px solid var(--gold);
   }
+
+  /* Optional text note input */
+  .text-input-zone {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: var(--surface2);
+  }
+  .text-input-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .text-input-area {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 10px 12px;
+    resize: vertical;
+    min-height: 44px;
+  }
+  .text-input-area:focus { outline: 1px solid var(--gold); }
+  .text-input-area::placeholder { color: var(--muted); }
+
+  /* Save postcard button */
+  .postcard-save-row {
+    padding: 16px 28px 20px;
+    background: #F5F0E8;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .postcard-save-btn {
+    background: transparent;
+    border: 1px solid #1a1a1a;
+    color: #1a1a1a;
+    border-radius: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 9px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .postcard-save-btn:hover { background: #1a1a1a; color: #F5F0E8; }
+  .postcard-save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
   /* Postcard left panel with photo */
   .postcard-left.has-photo {
     padding: 0;
@@ -1215,12 +1152,6 @@
     .budget-table { min-width: 460px; }
     .budget-input-row input { width: 68px; font-size: 11px; }
 
-    /* Stamps */
-    .stamps-section { padding: 20px 16px; }
-    .stamps-grid { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 8px; }
-    .stamp-inner { width: 66px; height: 66px; }
-    .stamp-emoji { font-size: 20px; }
-
     /* Postcard */
     .postcard-section { padding: 20px 16px; }
     .postcard-controls { flex-direction: column; }
@@ -1231,6 +1162,8 @@
     .postcard-stop-name { font-size: 18px; }
     .postcard-right { padding: 20px; }
     .postcard-message { font-size: 12px; }
+    .postcard-save-row { padding: 14px 20px 18px; }
+    .postcard-save-btn { width: 100%; text-align: center; }
 
     /* Live weather */
     .live-weather-section { padding: 20px 16px; }
@@ -1263,16 +1196,12 @@
     .hero-stats { gap: 12px; }
     .hero-stat .val { font-size: 20px; }
     .route-overview { grid-template-columns: 1fr 1fr; }
-    .stamps-grid { grid-template-columns: repeat(4, 1fr); }
-    .stamp-inner { width: 58px; height: 58px; }
-    .stamp-emoji { font-size: 18px; }
-    .stamp-label { font-size: 7px; }
   }
 
   /* Safety net: every major content card clips its own overflow so nothing
      inside can ever push the page wider than the viewport. */
-  .stamps-section, .postcard-section, .live-weather-section,
-  .wc-card, .route-mini-card, .live-weather-card, .stamp-inner, .permit-alert {
+  .postcard-section, .live-weather-section,
+  .wc-card, .route-mini-card, .live-weather-card, .permit-alert {
     overflow: hidden;
   }
 
@@ -1574,23 +1503,6 @@
       </div>
     </div>
 
-    <!-- ── STAMP COLLECTION ── -->
-    <div class="section-header">
-      <div>
-        <p class="section-eyebrow">Gamified</p>
-        <h2 class="section-title">Stamp Collection</h2>
-      </div>
-    </div>
-
-    <div class="stamps-section" id="stamps-section-anchor">
-      <div class="stamps-progress">
-        <div class="stamps-progress-bar"><div class="stamps-progress-fill" id="stamps-fill" style="width:0%"></div></div>
-        <div class="stamps-count"><span id="stamps-collected">0</span> / 25 collected</div>
-      </div>
-      <p class="stamps-intro">Tap a stamp when you've visited. Saves in your browser.</p>
-      <div class="stamps-grid" id="stamps-grid"></div>
-    </div>
-
     <!-- ── POSTCARD GENERATOR ── -->
     <div class="section-header">
       <div>
@@ -1614,6 +1526,11 @@
           <strong>📷 Add a photo (optional)</strong>
           Tap to upload from your camera roll — replaces the left panel
         </div>
+      </div>
+
+      <div class="text-input-zone" id="text-input-zone" style="margin-bottom:16px">
+        <div class="text-input-label">✏️ Add a note (optional)</div>
+        <textarea class="text-input-area" id="postcard-note-input" placeholder="Mention something specific you want included — an inside joke, what you did that day, who you're with..." rows="2"></textarea>
       </div>
 
       <div class="postcard-loading" id="postcard-loading">Writing your postcard from the road...</div>
@@ -1644,6 +1561,9 @@
               </div>
             </div>
           </div>
+        </div>
+        <div class="postcard-save-row">
+          <button class="postcard-save-btn" id="postcard-save-btn" onclick="savePostcard()">⬇ Save Postcard</button>
         </div>
       </div>
     </div>
@@ -2221,7 +2141,7 @@
       </div>
       <div class="stop-card-body">
         <div class="stop-body-grid">
-          <div class="stop-section"><div class="stop-section-title">🏨 Accommodation</div><div class="hotel-option"><span class="hotel-rank">TOP</span><span class="hotel-name"><a href="https://www.booking.com/hotel/us/hyatt-centric-downtown-denver.html" target="_blank">Hyatt Centric Downtown Denver ✓ Booked</a></span><span class="hotel-price">$625 total</span></div><div class="hotel-option"><span class="hotel-rank">HOSTEL</span><span class="hotel-name">Ember Hostel (jacuzzi + fire pit)</span><span class="hotel-price">~$48pp</span></div><div class="hotel-option"><span class="hotel-rank">HOSTEL</span><span class="hotel-name">Hostel Fish (bar downstairs)</span><span class="hotel-price">~$43pp</span></div></div>
+          <div class="stop-section"><div class="stop-section-title">🏨 Accommodation</div><div class="hotel-option"><span class="hotel-rank">TOP</span><span class="hotel-name"><a href="https://www.booking.com/hotel/us/hyatt-centric-downtown-denver.html" target="_blank">Hyatt Centric Downtown Denver</a></span><span class="hotel-price">$625 total</span></div><div class="hotel-option"><span class="hotel-rank">HOSTEL</span><span class="hotel-name">Ember Hostel (jacuzzi + fire pit)</span><span class="hotel-price">~$48pp</span></div><div class="hotel-option"><span class="hotel-rank">HOSTEL</span><span class="hotel-name">Hostel Fish (bar downstairs)</span><span class="hotel-price">~$43pp</span></div></div>
           <div class="stop-section"><div class="stop-section-title">🍺 Nightlife &amp; Food</div><ul class="highlights-list"><li>World Cup Final (Jul 19) — watch it here before heading to the mountains</li><li>RiNo Art District — best bars and restaurants in Denver</li><li>Larimer Square for cocktails and dinner</li><li>Great Divide Brewing or Tivoli for craft beer</li><li>Root Down for a great brunch before leaving</li></ul></div>
           <div class="stop-section"><div class="stop-section-title">⭐ Don't Miss</div><ul class="highlights-list"><li>Red Rocks Amphitheatre — even without a show, walk the rocks</li><li>Day trip to Boulder: Pearl Street Mall, mountain views</li><li>Denver Art Museum</li><li>City Park for a morning run with mountain views</li></ul></div>
           <div class="stop-section"><div class="stop-section-title">🌡️ Weather &amp; 🚗 Drive Out</div><div class="weather-bar" style="margin-bottom:16px"><div class="weather-item"><div class="weather-icon">☀️</div><div class="weather-temp warm">88°F / 31°C</div><div class="weather-label">Avg High</div></div><div class="weather-item"><div class="weather-temp mild">60°F / 15°C</div><div class="weather-label">Avg Low</div></div></div><div class="drive-info"><div class="drive-stat"><span class="val">75 mi</span><span class="lbl">To Rocky Mtn NP</span></div><div class="drive-sep">|</div><div class="drive-stat"><span class="val">~1.5 hrs</span><span class="lbl">Drive time</span></div></div></div>
@@ -2359,25 +2279,25 @@ const remainingData = [
     weather: ['72°F / 22°C','45°F / 7°C at summit'],
     drive: ['355 mi to Moab','~5.5 hrs'] },
   { num: '14', id: 'stop-14', name: 'Moab / Arches / Canyonlands', date: 'Jul 21–22', nights: '2 nights', tags: [{cls:'tag-desert',label:'Desert'},{cls:'tag-nature',label:'Nature'}],
-    accom: [['TOP','Hoodoo Moab, Curio by Hilton ✓ Booked','$505 total'],['MID','Wingate by Wyndham Moab','~$175/nt'],['$','Modern Mesa (highest rated in Moab)','~$230/nt']],
+    accom: [['TOP','Hoodoo Moab, Curio by Hilton','$505 total'],['MID','Wingate by Wyndham Moab','~$175/nt'],['$','Modern Mesa (highest rated in Moab)','~$230/nt']],
     food: ['Desert Bistro — best dinner in Moab','Moab Brewery for lunch','Jailhouse Café for breakfast'],
     miss: ['Delicate Arch hike (3 miles) — do it at sunset','Landscape Arch — world\'s longest natural arch','Canyonlands Island in the Sky viewpoints','Colorado River scenic drive (UT-128)'],
     weather: ['105°F / 41°C','⚠️ Brutal heat. Hike before 8am or after 6pm. Carry 3L water minimum.'],
     drive: ['130 mi to Bryce Canyon','~2.5 hrs'] },
   { num: '15', id: 'stop-15', name: 'Bryce Canyon NP', date: 'Jul 23', nights: '1 night', tags: [{cls:'tag-nature',label:'Nature'}],
-    accom: [['TOP','Best Western Plus Bryce Canyon Grand ✓ Booked','~$195/nt'],['MID','Mountain Ridge Cabins (Hatch)','~$170/nt'],['$','Bryce Canyon Country Inn','~$140/nt']],
+    accom: [['TOP','Best Western Plus Bryce Canyon Grand','~$195/nt'],['MID','Mountain Ridge Cabins (Hatch)','~$170/nt'],['$','Bryce Canyon Country Inn','~$140/nt']],
     food: ['Best Western breakfast — one of the best on the trip','Hungry Buffalo at Ruby\'s Inn for dinner','Stock up in Panguitch before arriving — limited options'],
     miss: ['Sunrise at Bryce Point — wake up at 5am, worth it','Queens Garden + Navajo Loop combo hike','Hoodoos from below on the Navajo Loop','Stargazing — one of the darkest skies in the US'],
     weather: ['75°F / 24°C (elevation 8,000ft)','45°F / 7°C at night — bring a layer'],
     drive: ['83 mi to Zion','~1.5 hrs'] },
   { num: '16', id: 'stop-16', name: 'Zion National Park', date: 'Jul 24', nights: '1 night', tags: [{cls:'tag-nature',label:'Nature'}],
-    accom: [['TOP','Zion Lodge ✓ Booked ⚠️','$360/nt'],['MID','Springdale Zion Inn','~$230/nt'],['$','Zion Ponderosa Ranch Resort','~$175/nt']],
+    accom: [['TOP','Zion Lodge','$360/nt'],['MID','Springdale Zion Inn','~$230/nt'],['$','Zion Ponderosa Ranch Resort','~$175/nt']],
     food: ['Red Rock Grill at Zion Lodge — eat in the park','Spotted Dog Café in Springdale for dinner','Oscar\'s Café in Springdale for breakfast'],
     miss: ['Angels Landing — most dramatic hike in the US (permit required)','The Narrows — hike up the Virgin River canyon','Canyon Overlook Trail — big views, short hike','Emerald Pools trail for waterfalls'],
     weather: ['100°F / 38°C at valley floor','Much cooler in The Narrows','⚠️ Book Angels Landing permit on recreation.gov'],
     drive: ['160 mi to Monument Valley','~2.5 hrs'] },
   { num: '17', id: 'stop-17', name: 'Monument Valley', date: 'Jul 25', nights: '1 night', tags: [{cls:'tag-desert',label:'Desert'}],
-    accom: [['TOP','The View Hotel ✓ Booked ⚠️','$279/nt'],['MID','Goulding\'s Lodge','~$195/nt'],['$','Hampton Inn Kayenta','~$150/nt']],
+    accom: [['TOP','The View Hotel','$279/nt'],['MID','Goulding\'s Lodge','~$195/nt'],['$','Hampton Inn Kayenta','~$150/nt']],
     food: ['The View Hotel restaurant — eat watching the Mittens at sunset','Goulding\'s has a good on-site restaurant','Stock up before arriving — very remote'],
     miss: ['Wildcat Trail at sunrise — walk among the Mittens yourself','John Ford\'s Point — the most photographed spot in the valley','Navajo-guided jeep tour (book ahead)','Stargazing — unreal sky with zero light pollution'],
     weather: ['100°F / 38°C','⚠️ Fill up on gas before arriving. Very remote area.'],
@@ -2389,7 +2309,7 @@ const remainingData = [
     weather: ['105°F / 41°C','⚠️ Hike Horseshoe Bend early morning only. Antelope Canyon is shaded.'],
     drive: ['130 mi to Grand Canyon S. Rim','~2.5 hrs'] },
   { num: '19', id: 'stop-19', name: 'Grand Canyon South Rim', date: 'Jul 27', nights: '1 night', tags: [{cls:'tag-desert',label:'Desert'},{cls:'tag-nature',label:'Nature'}],
-    accom: [['TOP','Maswik Lodge ✓ Booked','$171/nt'],['MID','Inn History Grand Canyon (Williams)','~$180/nt'],['$','Rodeway Inn Williams','~$100/nt']],
+    accom: [['TOP','Maswik Lodge','$171/nt'],['MID','Inn History Grand Canyon (Williams)','~$180/nt'],['$','Rodeway Inn Williams','~$100/nt']],
     food: ['El Tovar Dining Room — the best meal on the South Rim (book ahead!)','Bright Angel Restaurant inside the park','Maswik Pizza Pub for casual post-hike dinner'],
     miss: ['Mather Point at sunrise — set your alarm','Rim Trail walk along the edge','Bright Angel Trail — go 1–2 miles down, no further in July heat','Desert View Watchtower at the eastern rim'],
     weather: ['90°F / 32°C at rim','120°F+ at canyon floor','⚠️ Never hike to the bottom and back in one July day. Rangers enforce this.'],
@@ -2401,19 +2321,19 @@ const remainingData = [
     weather: ['100°F / 38°C','⚠️ Morning hikes only. Red rocks hold heat. Beautiful in early morning.'],
     drive: ['115 mi to Scottsdale','~2 hrs'] },
   { num: '21', id: 'stop-21', name: 'Scottsdale', date: 'Jul 29–30', nights: '1 night', tags: [{cls:'tag-nightlife',label:'Nightlife'},{cls:'tag-city',label:'City'}],
-    accom: [['TOP','Canopy by Hilton Scottsdale Old Town ✓ Booked','$410 total'],['MID','Hilton Garden Inn Scottsdale Old Town','~$175/nt'],['$PLURGE','Caesars Republic Scottsdale','~$300/nt']],
+    accom: [['TOP','Canopy by Hilton Scottsdale Old Town','$410 total'],['MID','Hilton Garden Inn Scottsdale Old Town','~$175/nt'],['$PLURGE','Caesars Republic Scottsdale','~$300/nt']],
     food: ['Maple &amp; Ash — stunning wood-fired dinner in Old Town','Steak 44 for an upscale night out','Postino Wine Café for a relaxed late lunch','Sugar Bowl for old-school ice cream after',],
     miss: ['Old Town Scottsdale bar crawl — start at 8pm when it cools down','Scottsdale Fashion Square rooftop bars','Pool day at your hotel — July deals mean resort pools for fraction of winter cost','Frank Lloyd Wright\'s Taliesin West (morning only)'],
     weather: ['107°F / 42°C','⚠️ Hottest stop on the trip. Go out after dark. July is off-peak — great deals.'],
     drive: ['440 mi to Mammoth Lakes','~6.5 hrs'] },
   { num: '22', id: 'stop-22', name: 'Mammoth Lakes', date: 'Jul 30', nights: '1 night', tags: [{cls:'tag-nature',label:'Nature'}],
-    accom: [['TOP','The Westin Monache Resort ✓ Booked','$450/nt'],['MID','Village Lodge Mammoth','~$230/nt'],['$','Limelight Mammoth','~$230/nt']],
+    accom: [['TOP','The Westin Monache Resort','$450/nt'],['MID','Village Lodge Mammoth','~$230/nt'],['$','Limelight Mammoth','~$230/nt']],
     food: ['Mammoth Tavern for dinner — local favourite','The Stove for breakfast','Campo Beer and Food — good craft beer garden'],
     miss: ['Devils Postpile National Monument — short hike, remarkable geology','Minaret Vista viewpoint at sunset','Hot Creek Geological Site (geothermal pools — do not swim, just observe)','June Lake Loop scenic drive'],
     weather: ['75°F / 24°C (elevation 7,800ft)','55°F / 13°C at night — big temperature swing from Scottsdale'],
     drive: ['320 mi to Lake Tahoe','~5 hrs'] },
   { num: '23', id: 'stop-23', name: 'Lake Tahoe / Reno', date: 'Jul 31–Aug 1', nights: '2 nights', tags: [{cls:'tag-nature',label:'Nature'},{cls:'tag-nightlife',label:'Nightlife'}],
-    accom: [['TOP','Coachman Hotel ✓ Booked','TBC'],['MID','Hampton Inn &amp; Suites South Lake Tahoe','~$185/nt'],['$','Tahoe Mountain Inn','~$175/nt']],
+    accom: [['TOP','Coachman Hotel','TBC'],['MID','Hampton Inn &amp; Suites South Lake Tahoe','~$185/nt'],['$','Tahoe Mountain Inn','~$175/nt']],
     food: ['Edgewood Restaurant for a lakeside dinner','Sunnyside Resort for lunch on the water','The Cottonwood Restaurant in Truckee','Reno: Louis\' Basque Corner — legendary and cheap'],
     miss: ['Emerald Bay State Park — most photographed spot on Tahoe','Lake Tahoe kayak or paddleboard rental','Incline Village for a North Shore day','Reno evening: Silver Legacy Casino, Whitney Peak rooftop bar'],
     weather: ['82°F / 28°C','55°F / 13°C at night','Water temperature ~68°F — swimmable!'],
@@ -2547,120 +2467,6 @@ const regionObserver = new IntersectionObserver((entries) => {
 document.querySelectorAll('.stop-card').forEach(el => regionObserver.observe(el));
 
 // ═══════════════════════════════════════════════
-// FEATURE 2: STAMP COLLECTION
-// ═══════════════════════════════════════════════
-const stampData = [
-  { id: 'stop-1',  num: '01', name: 'D.C.',         emoji: '🏛️' },
-  { id: 'stop-2',  num: '02', name: 'Philly',        emoji: '🔔' },
-  { id: 'stop-3',  num: '03', name: 'Shenandoah',    emoji: '🌲' },
-  { id: 'stop-4',  num: '04', name: 'Asheville',     emoji: '🍺' },
-  { id: 'stop-5',  num: '05', name: 'Smokies',       emoji: '🏔️' },
-  { id: 'stop-6',  num: '06', name: 'Nashville',     emoji: '🎸' },
-  { id: 'stop-7',  num: '07', name: 'Memphis',       emoji: '🎵' },
-  { id: 'stop-8',  num: '08', name: 'Louisville',    emoji: '🥃' },
-  { id: 'stop-9',  num: '09', name: 'Chicago',       emoji: '🌆' },
-  { id: 'stop-10', num: '10', name: 'St. Louis',     emoji: '🏛️' },
-  { id: 'stop-11', num: '11', name: 'Kansas City',   emoji: '🎷' },
-  { id: 'stop-12', num: '12', name: 'Denver',        emoji: '🏔️' },
-  { id: 'stop-13', num: '13', name: 'Rocky Mtn',     emoji: '🦌' },
-  { id: 'stop-14', num: '14', name: 'Moab',          emoji: '🪨' },
-  { id: 'stop-15', num: '15', name: 'Bryce',         emoji: '🏜️' },
-  { id: 'stop-16', num: '16', name: 'Zion',          emoji: '🏞️' },
-  { id: 'stop-17', num: '17', name: 'Mon. Valley',   emoji: '🗿' },
-  { id: 'stop-18', num: '18', name: 'Page AZ',       emoji: '🌀' },
-  { id: 'stop-19', num: '19', name: 'Grand Canyon',  emoji: '🌄' },
-  { id: 'stop-20', num: '20', name: 'Sedona',        emoji: '🔴' },
-  { id: 'stop-21', num: '21', name: 'Scottsdale',    emoji: '🌵' },
-  { id: 'stop-22', num: '22', name: 'Mammoth',       emoji: '⛰️' },
-  { id: 'stop-23', num: '23', name: 'Tahoe',         emoji: '🏊' },
-  { id: 'stop-24', num: '24', name: 'San Francisco', emoji: '🌉' },
-  { id: 'stop-25', num: '25', name: 'Los Angeles',   emoji: '🎬' },
-];
-
-const STAMP_KEY = 'roadtrip2026_stamps';
-
-function getCollected() {
-  try { return JSON.parse(localStorage.getItem(STAMP_KEY) || '[]'); } catch { return []; }
-}
-
-function saveCollected(arr) {
-  try { localStorage.setItem(STAMP_KEY, JSON.stringify(arr)); } catch {}
-}
-
-function updateStampProgress() {
-  const collected = getCollected();
-  const pct = (collected.length / stampData.length) * 100;
-  document.getElementById('stamps-fill').style.width = pct + '%';
-  document.getElementById('stamps-collected').textContent = collected.length;
-}
-
-function buildStamps() {
-  const grid = document.getElementById('stamps-grid');
-  const collected = getCollected();
-  grid.innerHTML = '';
-  stampData.forEach(s => {
-    const isCollected = collected.includes(s.id);
-    const div = document.createElement('div');
-    div.className = 'stamp' + (isCollected ? ' collected' : '');
-    div.id = 'stamp-' + s.id;
-    div.onclick = () => toggleStamp(s.id);
-    div.innerHTML = `
-      <div class="stamp-inner">
-        <span class="stamp-collected-tick">✓</span>
-        <div class="stamp-emoji">${s.emoji}</div>
-        <div class="stamp-num">${s.num}</div>
-      </div>
-      <div class="stamp-label">${s.name}</div>
-    `;
-    grid.appendChild(div);
-  });
-  updateStampProgress();
-}
-
-function toggleStamp(id) {
-  const collected = getCollected();
-  const idx = collected.indexOf(id);
-  const el = document.getElementById('stamp-' + id);
-  if (idx === -1) {
-    collected.push(id);
-    el.classList.add('collected');
-    el.querySelector('.stamp-inner').classList.add('stamp-pop');
-    setTimeout(() => el.querySelector('.stamp-inner').classList.remove('stamp-pop'), 400);
-  } else {
-    collected.splice(idx, 1);
-    el.classList.remove('collected');
-  }
-  saveCollected(collected);
-  updateStampProgress();
-}
-
-buildStamps();
-
-// Also add "Mark as visited" buttons to each stop card after build
-function addVisitedButtons() {
-  stampData.forEach(s => {
-    const card = document.getElementById(s.id);
-    if (!card) return;
-    const header = card.querySelector('.stop-info-row');
-    if (!header) return;
-    const btn = document.createElement('button');
-    btn.id = 'visit-btn-' + s.id;
-    btn.style.cssText = 'background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;padding:3px 8px;cursor:pointer;transition:all 0.2s;margin-left:4px;letter-spacing:0.08em';
-    btn.textContent = getCollected().includes(s.id) ? '✓ VISITED' : '+ MARK VISITED';
-    btn.style.color = getCollected().includes(s.id) ? 'var(--gold)' : 'var(--muted)';
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      toggleStamp(s.id);
-      const col = getCollected().includes(s.id);
-      btn.textContent = col ? '✓ VISITED' : '+ MARK VISITED';
-      btn.style.color = col ? 'var(--gold)' : 'var(--muted)';
-    };
-    header.appendChild(btn);
-  });
-}
-setTimeout(addVisitedButtons, 100);
-
-// ═══════════════════════════════════════════════
 // FEATURE 3: POSTCARD GENERATOR (Claude API)
 // ═══════════════════════════════════════════════
 const postcardStops = [
@@ -2775,17 +2581,24 @@ async function generatePostcard() {
   const btn = document.getElementById('postcard-btn');
   const loading = document.getElementById('postcard-loading');
   const output = document.getElementById('postcard-output');
+  const noteInput = document.getElementById('postcard-note-input');
+  const userNote = noteInput ? noteInput.value.trim() : '';
 
   btn.disabled = true;
   loading.classList.add('visible');
   output.classList.remove('visible');
 
   const hasPhoto = !!uploadedPhotoBase64;
+  const hasNote = userNote.length > 0;
+
+  const noteInstruction = hasNote
+    ? ` The writer specifically wants this detail included or referenced naturally in the message: "${userNote}".`
+    : '';
 
   // Build message content — include image if uploaded
   const textPrompt = hasPhoto
-    ? `Write a short postcard message (4–6 sentences) from ${stop.value} (${stop.region}, ${stop.date}) on a US road trip from Washington DC to Los Angeles. The writer is a British couple in their 30s having the trip of their lives in summer 2026. I'm attaching our actual photo from this location — weave in one specific detail from what you can see in it. Also capture the essence of the place: ${stop.tags}. Write in first person, warm and vivid, as if handwriting to friends back home in England. End with a single punchy final sentence. No sign-off or greeting — just the message itself. Keep it under 85 words.`
-    : `Write a short postcard message (4–6 sentences) from ${stop.value} (${stop.region}, ${stop.date}) on a US road trip from Washington DC to Los Angeles. The writer is a British couple in their 30s having the trip of their lives in summer 2026. Capture the essence of this specific place: ${stop.tags}. Write in first person, warm and vivid, as if handwriting to friends back home in England. End with a single punchy final sentence. No sign-off or greeting — just the message itself. Keep it under 80 words.`;
+    ? `Write a short postcard message (4–6 sentences) from ${stop.value} (${stop.region}, ${stop.date}) on a US road trip from Washington DC to Los Angeles. The writer is a British couple in their 30s having the trip of their lives in summer 2026. I'm attaching our actual photo from this location — weave in one specific detail from what you can see in it. Also capture the essence of the place: ${stop.tags}.${noteInstruction} Write in first person, warm and vivid, as if handwriting to friends back home in England. End with a single punchy final sentence. No sign-off or greeting — just the message itself. Keep it under 85 words.`
+    : `Write a short postcard message (4–6 sentences) from ${stop.value} (${stop.region}, ${stop.date}) on a US road trip from Washington DC to Los Angeles. The writer is a British couple in their 30s having the trip of their lives in summer 2026. Capture the essence of this specific place: ${stop.tags}.${noteInstruction} Write in first person, warm and vivid, as if handwriting to friends back home in England. End with a single punchy final sentence. No sign-off or greeting — just the message itself. Keep it under 80 words.`;
 
   const messageContent = hasPhoto
     ? [
@@ -2834,6 +2647,172 @@ async function generatePostcard() {
 
   loading.classList.remove('visible');
   btn.disabled = false;
+}
+
+// Save postcard as a downloadable image (renders the DOM postcard onto a canvas)
+async function savePostcard() {
+  const saveBtn = document.getElementById('postcard-save-btn');
+  const postcardInner = document.querySelector('#postcard-output .postcard-inner');
+  if (!postcardInner) return;
+
+  saveBtn.disabled = true;
+  const originalLabel = saveBtn.textContent;
+  saveBtn.textContent = 'Preparing...';
+
+  try {
+    const width = 1200;
+    const height = 720;
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+
+    const leftPanel = document.getElementById('postcard-left');
+    const hasPhoto = leftPanel.classList.contains('has-photo');
+    const halfW = width / 2;
+
+    // Draw left panel
+    if (hasPhoto && uploadedPhotoDataUrl) {
+      const img = new Image();
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = uploadedPhotoDataUrl;
+      });
+      // cover-fit crop
+      const imgRatio = img.width / img.height;
+      const targetRatio = halfW / height;
+      let sx, sy, sw, sh;
+      if (imgRatio > targetRatio) {
+        sh = img.height;
+        sw = sh * targetRatio;
+        sx = (img.width - sw) / 2;
+        sy = 0;
+      } else {
+        sw = img.width;
+        sh = sw / targetRatio;
+        sx = 0;
+        sy = (img.height - sh) / 2;
+      }
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, halfW, height);
+      // dark gradient overlay for text legibility
+      const grad = ctx.createLinearGradient(0, height, 0, 0);
+      grad.addColorStop(0, 'rgba(0,0,0,0.75)');
+      grad.addColorStop(0.5, 'rgba(0,0,0,0.2)');
+      grad.addColorStop(1, 'rgba(0,0,0,0.35)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, halfW, height);
+    } else {
+      // gradient background matching region colour
+      const bgStyle = getComputedStyle(leftPanel).background;
+      const grad = ctx.createLinearGradient(0, 0, halfW, height);
+      grad.addColorStop(0, '#0D1117');
+      grad.addColorStop(1, '#1A1117');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, halfW, height);
+    }
+
+    // Left panel text
+    const region = document.getElementById('pc-region').textContent;
+    const stopName = document.getElementById('pc-stopname').textContent;
+    const emoji = document.getElementById('pc-emoji').textContent;
+    const dateLabel = document.getElementById('pc-date').textContent;
+
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = '#E8C547';
+    ctx.font = '700 18px "Space Mono", monospace';
+    ctx.fillText(region, 48, 70);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 44px "Playfair Display", serif';
+    // wrap stop name if too long
+    wrapCanvasText(ctx, stopName, 48, 120, halfW - 96, 50);
+
+    if (emoji) {
+      ctx.font = '64px sans-serif';
+      ctx.fillText(emoji, 48, 240);
+    }
+
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.font = '400 16px "Space Mono", monospace';
+    ctx.fillText(dateLabel, 48, height - 48);
+
+    // Right panel (postcard paper)
+    ctx.fillStyle = '#F5F0E8';
+    ctx.fillRect(halfW, 0, halfW, height);
+    // dashed divider
+    ctx.strokeStyle = '#cccccc';
+    ctx.setLineDash([6, 6]);
+    ctx.beginPath();
+    ctx.moveTo(halfW, 0);
+    ctx.lineTo(halfW, height);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Message text
+    const message = document.getElementById('pc-message').textContent;
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = 'italic 400 22px "Playfair Display", serif';
+    wrapCanvasText(ctx, message, halfW + 48, 80, halfW - 96, 32, 12);
+
+    // Address block
+    const addrY = height - 150;
+    ctx.strokeStyle = '#cccccc';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(halfW + 48, addrY);
+    ctx.lineTo(width - 48, addrY);
+    ctx.stroke();
+
+    // Stamp box
+    ctx.strokeStyle = '#999999';
+    ctx.strokeRect(width - 48 - 70, addrY + 20, 70, 84);
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = '32px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('✉️', width - 48 - 35, addrY + 70);
+    ctx.textAlign = 'left';
+
+    ctx.fillStyle = '#666666';
+    ctx.font = '13px "Space Mono", monospace';
+    ctx.fillText('Friends & Family', halfW + 48, addrY + 35);
+    ctx.fillText('Somewhere in England', halfW + 48, addrY + 58);
+    ctx.fillText('United Kingdom', halfW + 48, addrY + 81);
+
+    // Trigger download
+    const stopValSafe = stopName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    const link = document.createElement('a');
+    link.download = `postcard_${stopValSafe}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+
+  } catch (e) {
+    alert('Could not save the postcard image. Try taking a screenshot instead.');
+  }
+
+  saveBtn.disabled = false;
+  saveBtn.textContent = originalLabel;
+}
+
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
+  const words = text.split(' ');
+  let line = '';
+  let curY = y;
+  let lineCount = 0;
+  for (let i = 0; i < words.length; i++) {
+    const testLine = line + words[i] + ' ';
+    const testWidth = ctx.measureText(testLine).width;
+    if (testWidth > maxWidth && line !== '') {
+      ctx.fillText(line.trim(), x, curY);
+      line = words[i] + ' ';
+      curY += lineHeight;
+      lineCount++;
+      if (maxLines && lineCount >= maxLines) return;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line.trim(), x, curY);
 }
 
 // ═══════════════════════════════════════════════
@@ -2911,7 +2890,6 @@ loadWeather();</script>
 <nav class="mobile-nav" aria-label="Quick navigation">
   <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;"><span>🗺️</span>Top</a>
   <a href="#budget-section-anchor"><span>💰</span>Budget</a>
-  <a href="#stamps-section-anchor"><span>🏷️</span>Stamps</a>
   <a href="#postcard-section-anchor"><span>✉️</span>Postcard</a>
   <a href="#itinerary-section-anchor"><span>📍</span>Stops</a>
 </nav>
