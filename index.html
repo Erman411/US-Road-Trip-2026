@@ -11,6 +11,24 @@
   html, body {
     overflow-x: hidden;
     max-width: 100%;
+    width: 100%;
+  }
+
+  /* Global defence: flex/grid children default to min-width:auto which can
+     force their container wider than the viewport when content can't shrink.
+     Override this everywhere except where we explicitly need intrinsic sizing. */
+  .hero, .main-layout, .sidebar, .content, .route-line-wrap,
+  .stop-card, .stop-card-header, .stop-meta, .stop-info-row, .stop-tags,
+  .hero-stats, .hero-stat, .countdown-box, .countdown-unit,
+  .route-overview, .route-mini-card, .mini-info,
+  .wc-grid, .wc-card, .budget-totals, .budget-total-item,
+  .stamps-grid, .stamp, .stamps-progress,
+  .weather-grid, .live-weather-card,
+  .postcard-controls, .postcard-output, .postcard-inner, .postcard-left, .postcard-right,
+  .drive-info, .drive-stat, .weather-bar, .weather-item,
+  .stop-body-grid, .stop-section,
+  .mobile-nav {
+    min-width: 0;
   }
 
   :root {
@@ -179,8 +197,8 @@
     font-family: 'Space Mono', monospace;
     font-size: 12px;
     padding: 10px 14px;
-    flex: 1;
-    min-width: 200px;
+    flex: 1 1 200px;
+    min-width: 0;
     appearance: none;
     cursor: pointer;
   }
@@ -569,7 +587,9 @@
     margin: 0 auto;
     padding: 0 24px;
     gap: 0;
+    min-width: 0;
   }
+  .main-layout > * { min-width: 0; }
 
   /* ── SIDEBAR ── */
   .sidebar {
@@ -1247,6 +1267,13 @@
     .stamp-inner { width: 58px; height: 58px; }
     .stamp-emoji { font-size: 18px; }
     .stamp-label { font-size: 7px; }
+  }
+
+  /* Safety net: every major content card clips its own overflow so nothing
+     inside can ever push the page wider than the viewport. */
+  .stamps-section, .postcard-section, .live-weather-section,
+  .wc-card, .route-mini-card, .live-weather-card, .stamp-inner, .permit-alert {
+    overflow: hidden;
   }
 
   /* ── MOBILE BOTTOM NAV ── */
