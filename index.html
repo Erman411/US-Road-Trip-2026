@@ -24,7 +24,7 @@
   .wc-grid, .wc-card, .budget-totals, .budget-total-item,
   .weather-grid, .live-weather-card,
   .postcard-controls, .postcard-output, .postcard-inner, .postcard-left, .postcard-right,
-  .text-input-zone, .postcard-save-row,
+  .text-input-zone, .postcard-save-row, .route-map-section, #route-map,
   .drive-info, .drive-stat, .weather-bar, .weather-item,
   .stop-body-grid, .stop-section,
   .mobile-nav {
@@ -974,6 +974,31 @@
     margin-bottom: 48px;
   }
 
+  .route-map-section {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 48px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  #route-map {
+    width: 100%;
+  }
+
+  #route-map svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .route-map-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+  }
+
   .wc-card {
     background: var(--surface2);
     border: 1px solid var(--border);
@@ -1370,6 +1395,20 @@
       <a class="route-mini-card" href="#stop-23"><span class="mini-num">23</span><div class="mini-info"><div class="mini-name">Lake Tahoe / Reno</div><div class="mini-date">Aug 3–4</div></div><div class="mini-dot" style="background:#6BBD96"></div></a>
       <a class="route-mini-card" href="#stop-24"><span class="mini-num">24</span><div class="mini-info"><div class="mini-name">San Francisco</div><div class="mini-date">Aug 5</div></div><div class="mini-dot" style="background:#7BB8D8"></div></a>
       <a class="route-mini-card" href="#stop-25"><span class="mini-num">25</span><div class="mini-info"><div class="mini-name">Los Angeles</div><div class="mini-date">Aug 6–7</div></div><div class="mini-dot" style="background:#7BB8D8"></div></a>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ROUTE MAP -->
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">The Full Picture</p>
+        <h2 class="section-title">Route Map</h2>
+      </div>
+    </div>
+
+    <div class="route-map-section">
+      <div id="route-map"></div>
     </div>
 
     <div class="divider"></div>
@@ -3130,6 +3169,101 @@ loadWeather();</script>
   <a href="#postcard-section-anchor"><span>✉️</span>Postcard</a>
   <a href="#itinerary-section-anchor"><span>📍</span>Stops</a>
 </nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script>
+(function() {
+  const routeStops = [
+    {num:1,name:"Washington, D.C.",lat:38.9072,lng:-77.0369},
+    {num:2,name:"Philadelphia",lat:39.9526,lng:-75.1652},
+    {num:3,name:"Shenandoah NP",lat:38.5318,lng:-78.4453},
+    {num:4,name:"Asheville",lat:35.5951,lng:-82.5515},
+    {num:5,name:"Great Smoky Mtns",lat:35.6118,lng:-83.4895},
+    {num:6,name:"Nashville",lat:36.1627,lng:-86.7816},
+    {num:7,name:"Chicago",lat:41.8781,lng:-87.6298},
+    {num:8,name:"St. Louis",lat:38.6270,lng:-90.1994},
+    {num:9,name:"Kansas City",lat:39.0997,lng:-94.5786},
+    {num:10,name:"Denver / Boulder",lat:39.7392,lng:-104.9903},
+    {num:11,name:"Salt Lake City",lat:40.7608,lng:-111.8910},
+    {num:12,name:"Moab / Arches",lat:38.5733,lng:-109.5498},
+    {num:13,name:"Bryce Canyon NP",lat:37.5930,lng:-112.1871},
+    {num:14,name:"Zion NP",lat:37.2982,lng:-113.0263},
+    {num:15,name:"Monument Valley",lat:36.9981,lng:-110.1007},
+    {num:16,name:"Page, AZ",lat:36.9147,lng:-111.4558},
+    {num:17,name:"Grand Canyon S. Rim",lat:36.0544,lng:-112.1401},
+    {num:18,name:"Sedona",lat:34.8697,lng:-111.7610},
+    {num:19,name:"Scottsdale",lat:33.4942,lng:-111.9261},
+    {num:20,name:"Las Vegas",lat:36.1699,lng:-115.1398},
+    {num:21,name:"Mammoth Lakes",lat:37.6485,lng:-118.9721},
+    {num:22,name:"Yosemite NP",lat:37.8651,lng:-119.5383},
+    {num:23,name:"Lake Tahoe / Reno",lat:39.0968,lng:-120.0324},
+    {num:24,name:"San Francisco",lat:37.7749,lng:-122.4194},
+    {num:25,name:"Los Angeles",lat:34.0522,lng:-118.2437}
+  ];
+
+  const mapEl = document.getElementById('route-map');
+  if (!mapEl) return;
+
+  const routeColor = '#E8C547';
+  const dotFill = '#0D0D0B';
+  const landFill = '#1A1812';
+  const landStroke = 'rgba(232,197,71,0.15)';
+  const labelColor = '#E8E4D8';
+
+  const svg = d3.select('#route-map').append('svg')
+    .attr('viewBox', '0 0 975 610')
+    .attr('width', '100%')
+    .attr('role', 'img')
+    .attr('aria-label', 'Map of the United States showing the 25-stop road trip route from Washington D.C. to Los Angeles');
+
+  const projection = d3.geoAlbersUsa().scale(1300).translate([487, 305]);
+  const path = d3.geoPath(projection);
+
+  d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json').then(function(us) {
+    svg.append('g').selectAll('path')
+      .data(topojson.feature(us, us.objects.states).features)
+      .join('path')
+      .attr('d', path)
+      .attr('fill', landFill)
+      .attr('stroke', landStroke)
+      .attr('stroke-width', 0.75);
+
+    const linePoints = routeStops.map(function(s) { return projection([s.lng, s.lat]); });
+    const lineGen = d3.line().x(function(d){return d[0];}).y(function(d){return d[1];}).curve(d3.curveCatmullRom.alpha(0.5));
+
+    svg.append('path')
+      .attr('d', lineGen(linePoints))
+      .attr('fill', 'none')
+      .attr('stroke', routeColor)
+      .attr('stroke-width', 2.5)
+      .attr('stroke-linecap', 'round')
+      .attr('stroke-linejoin', 'round')
+      .attr('opacity', 0.85);
+
+    const g = svg.selectAll('.route-stop').data(routeStops).join('g')
+      .attr('class', 'route-stop')
+      .attr('transform', function(d) {
+        const p = projection([d.lng, d.lat]);
+        return 'translate(' + p[0] + ',' + p[1] + ')';
+      });
+
+    g.append('circle').attr('r', 5).attr('fill', dotFill).attr('stroke', routeColor).attr('stroke-width', 1.5);
+    g.append('circle').attr('r', 2).attr('fill', routeColor);
+
+    const labelSide = {1:'r',2:'r',3:'l',4:'l',5:'l',6:'l',7:'r',8:'r',9:'l',10:'r',11:'l',12:'r',13:'l',14:'l',15:'r',16:'r',17:'l',18:'r',19:'r',20:'l',21:'r',22:'l',23:'r',24:'l',25:'l'};
+    g.append('text')
+      .attr('class', 'route-map-label')
+      .attr('x', function(d) { return labelSide[d.num] === 'r' ? 9 : -9; })
+      .attr('y', 3)
+      .attr('text-anchor', function(d) { return labelSide[d.num] === 'r' ? 'start' : 'end'; })
+      .attr('fill', labelColor)
+      .text(function(d) { return d.num + '. ' + d.name; });
+  }).catch(function() {
+    mapEl.innerHTML = '<p style="font-family:Inter,sans-serif;font-size:13px;color:var(--muted);padding:24px;text-align:center">Map data could not be loaded — check your connection and refresh.</p>';
+  });
+})();
+</script>
 
 </body>
 </html>
